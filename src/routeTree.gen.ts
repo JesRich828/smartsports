@@ -13,6 +13,7 @@ import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as GrantsRouteImport } from './routes/grants'
 import { Route as GolfRouteImport } from './routes/golf'
 import { Route as DonorsRouteImport } from './routes/donors'
+import { Route as BoardRouteImport } from './routes/board'
 import { Route as IndexRouteImport } from './routes/index'
 
 const ProgramsRoute = ProgramsRouteImport.update({
@@ -35,6 +36,11 @@ const DonorsRoute = DonorsRouteImport.update({
   path: '/donors',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BoardRoute = BoardRouteImport.update({
+  id: '/board',
+  path: '/board',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/board': typeof BoardRoute
   '/donors': typeof DonorsRoute
   '/golf': typeof GolfRoute
   '/grants': typeof GrantsRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/board': typeof BoardRoute
   '/donors': typeof DonorsRoute
   '/golf': typeof GolfRoute
   '/grants': typeof GrantsRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/board': typeof BoardRoute
   '/donors': typeof DonorsRoute
   '/golf': typeof GolfRoute
   '/grants': typeof GrantsRoute
@@ -65,14 +74,22 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/donors' | '/golf' | '/grants' | '/programs'
+  fullPaths: '/' | '/board' | '/donors' | '/golf' | '/grants' | '/programs'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/donors' | '/golf' | '/grants' | '/programs'
-  id: '__root__' | '/' | '/donors' | '/golf' | '/grants' | '/programs'
+  to: '/' | '/board' | '/donors' | '/golf' | '/grants' | '/programs'
+  id:
+    | '__root__'
+    | '/'
+    | '/board'
+    | '/donors'
+    | '/golf'
+    | '/grants'
+    | '/programs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BoardRoute: typeof BoardRoute
   DonorsRoute: typeof DonorsRoute
   GolfRoute: typeof GolfRoute
   GrantsRoute: typeof GrantsRoute
@@ -109,6 +126,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DonorsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/board': {
+      id: '/board'
+      path: '/board'
+      fullPath: '/board'
+      preLoaderRoute: typeof BoardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -121,6 +145,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BoardRoute: BoardRoute,
   DonorsRoute: DonorsRoute,
   GolfRoute: GolfRoute,
   GrantsRoute: GrantsRoute,
