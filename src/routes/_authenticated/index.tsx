@@ -23,7 +23,7 @@ import { ProgressRow } from "@/components/dashboard/ProgressRow";
 import { useStore } from "@/lib/store";
 import { currency, compactCurrency, pct } from "@/lib/format";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Executive Dashboard — SMART Sports FY26" },
