@@ -80,13 +80,13 @@ export function useDashboard() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: QKEY });
 
-  async function addRow(table: TableName, row: Record<string, unknown>) {
+  async function addRow(table: TableName, row: Record<string, any>) {
     const { error } = await (supabase.from(table) as any).insert(strip(row));
     if (error) throw error;
     await invalidate();
   }
 
-  async function saveRow(table: TableName, id: string, patch: Record<string, unknown>) {
+  async function saveRow(table: TableName, id: string, patch: Record<string, any>) {
     const { error } = await (supabase.from(table) as any).update(strip(patch)).eq("id", id);
     if (error) throw error;
     await invalidate();
