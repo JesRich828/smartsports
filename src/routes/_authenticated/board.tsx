@@ -13,6 +13,7 @@ import {
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { ProgressRow } from "@/components/dashboard/ProgressRow";
+import { toast } from "sonner";
 import { useDashboard } from "@/lib/db";
 import { currency, compactCurrency } from "@/lib/format";
 import type { BoardMember } from "@/lib/types";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/_authenticated/board")({
 });
 
 function BoardPage() {
-  const { data, setData } = useStore();
+  const { data, saveRow } = useDashboard();
   const board = data.board;
 
   const totalGiven = board.reduce((s, b) => s + b.given, 0);
@@ -42,7 +43,9 @@ function BoardPage() {
     .reduce((s, g) => s + g.amountRequested, 0);
 
   function setMember(id: string, patch: Partial<BoardMember>) {
-    setData((prev) => ({ ...prev, board: prev.board.map((b) => (b.id === id ? { ...b, ...patch } : b)) }));
+    saveRow("board_members", id, patch).catch((e) =>
+      toast.error(e instanceof Error ? e.message : "Could not update board member"),
+    );
   }
 
   return (
