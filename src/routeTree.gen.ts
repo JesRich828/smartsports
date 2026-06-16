@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as GrantsRouteImport } from './routes/grants'
 import { Route as GolfRouteImport } from './routes/golf'
@@ -16,6 +17,11 @@ import { Route as DonorsRouteImport } from './routes/donors'
 import { Route as BoardRouteImport } from './routes/board'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgramsRoute = ProgramsRouteImport.update({
   id: '/programs',
   path: '/programs',
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/golf': typeof GolfRoute
   '/grants': typeof GrantsRoute
   '/programs': typeof ProgramsRoute
+  '/reports': typeof ReportsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/golf': typeof GolfRoute
   '/grants': typeof GrantsRoute
   '/programs': typeof ProgramsRoute
+  '/reports': typeof ReportsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,12 +79,27 @@ export interface FileRoutesById {
   '/golf': typeof GolfRoute
   '/grants': typeof GrantsRoute
   '/programs': typeof ProgramsRoute
+  '/reports': typeof ReportsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/board' | '/donors' | '/golf' | '/grants' | '/programs'
+  fullPaths:
+    | '/'
+    | '/board'
+    | '/donors'
+    | '/golf'
+    | '/grants'
+    | '/programs'
+    | '/reports'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/board' | '/donors' | '/golf' | '/grants' | '/programs'
+  to:
+    | '/'
+    | '/board'
+    | '/donors'
+    | '/golf'
+    | '/grants'
+    | '/programs'
+    | '/reports'
   id:
     | '__root__'
     | '/'
@@ -85,6 +108,7 @@ export interface FileRouteTypes {
     | '/golf'
     | '/grants'
     | '/programs'
+    | '/reports'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,10 +118,18 @@ export interface RootRouteChildren {
   GolfRoute: typeof GolfRoute
   GrantsRoute: typeof GrantsRoute
   ProgramsRoute: typeof ProgramsRoute
+  ReportsRoute: typeof ReportsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/programs': {
       id: '/programs'
       path: '/programs'
@@ -150,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   GolfRoute: GolfRoute,
   GrantsRoute: GrantsRoute,
   ProgramsRoute: ProgramsRoute,
+  ReportsRoute: ReportsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
