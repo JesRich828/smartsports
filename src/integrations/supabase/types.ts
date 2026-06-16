@@ -356,6 +356,39 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsors: {
+        Row: {
+          commitment: number | null
+          company: string
+          contact: string | null
+          created_at: string
+          id: string
+          sponsorship_level: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          commitment?: number | null
+          company: string
+          contact?: string | null
+          created_at?: string
+          id?: string
+          sponsorship_level?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commitment?: number | null
+          company?: string
+          contact?: string | null
+          created_at?: string
+          id?: string
+          sponsorship_level?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
