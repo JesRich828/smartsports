@@ -43,7 +43,7 @@ import {
   type Grant,
 } from "@/lib/types";
 
-export const Route = createFileRoute("/grants")({
+export const Route = createFileRoute("/_authenticated/grants")({
   head: () => ({
     meta: [
       { title: "Grant Tracking — SMART Sports FY26" },

@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 import { currency, compactCurrency } from "@/lib/format";
 import { PROGRAMS } from "@/lib/types";
 
-export const Route = createFileRoute("/programs")({
+export const Route = createFileRoute("/_authenticated/programs")({
   head: () => ({
     meta: [
       { title: "Programs Dashboard — SMART Sports" },

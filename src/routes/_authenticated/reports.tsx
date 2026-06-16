@@ -24,7 +24,7 @@ import { useStore } from "@/lib/store";
 import { currency, compactCurrency, formatDate, isThisMonth, pct } from "@/lib/format";
 import { PROGRAMS } from "@/lib/types";
 
-export const Route = createFileRoute("/reports")({
+export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
     meta: [
       { title: "Reports — SMART Sports FY26" },

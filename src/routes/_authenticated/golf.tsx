@@ -28,7 +28,7 @@ import { useStore, newId } from "@/lib/store";
 import { currency, compactCurrency } from "@/lib/format";
 import { SPONSOR_LEVELS, type AppData } from "@/lib/types";
 
-export const Route = createFileRoute("/golf")({
+export const Route = createFileRoute("/_authenticated/golf")({
   head: () => ({
     meta: [
       { title: "SMART Sports Invitational — Golf Tracker" },

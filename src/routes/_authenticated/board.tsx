@@ -17,7 +17,7 @@ import { useStore } from "@/lib/store";
 import { currency, compactCurrency } from "@/lib/format";
 import type { BoardMember } from "@/lib/types";
 
-export const Route = createFileRoute("/board")({
+export const Route = createFileRoute("/_authenticated/board")({
   head: () => ({
     meta: [
       { title: "Board Dashboard — SMART Sports" },

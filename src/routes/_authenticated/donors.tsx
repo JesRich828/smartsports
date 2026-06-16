@@ -36,7 +36,7 @@ import { useStore, newId } from "@/lib/store";
 import { currency, formatDate, compactCurrency } from "@/lib/format";
 import { DONOR_TYPES, DONOR_STAGES, type Donor } from "@/lib/types";
 
-export const Route = createFileRoute("/donors")({
+export const Route = createFileRoute("/_authenticated/donors")({
   head: () => ({
     meta: [
       { title: "Donor & Prospect CRM — SMART Sports" },
