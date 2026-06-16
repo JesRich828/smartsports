@@ -24,11 +24,11 @@ import {
 } from "@/components/ui/table";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { useStore, newId } from "@/lib/store";
+import { useDashboard } from "@/lib/db";
 import { currency, compactCurrency } from "@/lib/format";
-import { SPONSOR_LEVELS, type AppData } from "@/lib/types";
+import { SPONSOR_LEVELS } from "@/lib/types";
 
-export const Route = createFileRoute("/golf")({
+export const Route = createFileRoute("/_authenticated/golf")({
   head: () => ({
     meta: [
       { title: "SMART Sports Invitational — Golf Tracker" },
@@ -39,8 +39,10 @@ export const Route = createFileRoute("/golf")({
 });
 
 function GolfPage() {
-  const { data, setData } = useStore();
-  const g = data;
+  const { data: g, addRow, saveRow, removeRow } = useDashboard();
+
+  const run = (p: Promise<void>) =>
+    p.catch((e) => toast.error(e instanceof Error ? e.message : "Action failed"));
 
   const sponsorRev = g.golfSponsors.filter((s) => s.confirmed).reduce((s, x) => s + x.amount, 0);
   const sponsorPotential = g.golfSponsors.reduce((s, x) => s + x.amount, 0);
@@ -51,8 +53,6 @@ function GolfPage() {
   const revenue = sponsorRev + foursomeRev + playerRev + auctionRev;
   const expenses = g.golfExpenses.reduce((s, e) => s + e.amount, 0);
   const net = revenue - expenses;
-
-  function update(fn: (d: AppData) => AppData) { setData(fn); }
 
   return (
     <div>
@@ -95,15 +95,15 @@ function GolfPage() {
                     <TableCell className="text-sm text-muted-foreground">{s.level}</TableCell>
                     <TableCell className="text-right">{currency(s.amount)}</TableCell>
                     <TableCell>
-                      <Switch checked={s.confirmed} onCheckedChange={(v) => update((d) => ({ ...d, golfSponsors: d.golfSponsors.map((x) => x.id === s.id ? { ...x, confirmed: v } : x) }))} />
+                      <Switch checked={s.confirmed} onCheckedChange={(v) => run(saveRow("golf_sponsors", s.id, { confirmed: v }))} />
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{s.followUp || "—"}</TableCell>
-                    <TableCell><Button variant="ghost" size="icon" onClick={() => update((d) => ({ ...d, golfSponsors: d.golfSponsors.filter((x) => x.id !== s.id) }))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                    <TableCell><Button variant="ghost" size="icon" onClick={() => run(removeRow("golf_sponsors", s.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            <AddSponsor onAdd={(name, level, amount, followUp) => update((d) => ({ ...d, golfSponsors: [...d.golfSponsors, { id: newId(), name, level, amount, confirmed: false, followUp }] }))} />
+            <AddSponsor onAdd={(name, level, amount, followUp) => run(addRow("golf_sponsors", { name, level, amount, confirmed: false, followUp }))} />
           </Card>
         </TabsContent>
 
@@ -119,13 +119,13 @@ function GolfPage() {
                       <TableCell className="font-medium">{f.captain}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{f.organization}</TableCell>
                       <TableCell className="text-right">{currency(f.amount)}</TableCell>
-                      <TableCell><Switch checked={f.paid} onCheckedChange={(v) => update((d) => ({ ...d, golfFoursomes: d.golfFoursomes.map((x) => x.id === f.id ? { ...x, paid: v } : x) }))} /></TableCell>
-                      <TableCell><Button variant="ghost" size="icon" onClick={() => update((d) => ({ ...d, golfFoursomes: d.golfFoursomes.filter((x) => x.id !== f.id) }))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableCell><Switch checked={f.paid} onCheckedChange={(v) => run(saveRow("golf_foursomes", f.id, { paid: v }))} /></TableCell>
+                      <TableCell><Button variant="ghost" size="icon" onClick={() => run(removeRow("golf_foursomes", f.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <AddTwo placeholder1="Captain" placeholder2="Organization" onAdd={(a, b, amt) => update((d) => ({ ...d, golfFoursomes: [...d.golfFoursomes, { id: newId(), captain: a, organization: b, players: 4, amount: amt, paid: false }] }))} />
+              <AddTwo placeholder1="Captain" placeholder2="Organization" onAdd={(a, b, amt) => run(addRow("golf_foursomes", { captain: a, organization: b, players: 4, amount: amt, paid: false }))} />
             </Card>
             <Card className="p-4">
               <h3 className="mb-3 font-display font-semibold">Individual Players</h3>
@@ -137,13 +137,13 @@ function GolfPage() {
                       <TableCell className="font-medium">{p.name}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{p.organization}</TableCell>
                       <TableCell className="text-right">{currency(p.amount)}</TableCell>
-                      <TableCell><Switch checked={p.paid} onCheckedChange={(v) => update((d) => ({ ...d, golfPlayers: d.golfPlayers.map((x) => x.id === p.id ? { ...x, paid: v } : x) }))} /></TableCell>
-                      <TableCell><Button variant="ghost" size="icon" onClick={() => update((d) => ({ ...d, golfPlayers: d.golfPlayers.filter((x) => x.id !== p.id) }))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                      <TableCell><Switch checked={p.paid} onCheckedChange={(v) => run(saveRow("golf_players", p.id, { paid: v }))} /></TableCell>
+                      <TableCell><Button variant="ghost" size="icon" onClick={() => run(removeRow("golf_players", p.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <AddTwo placeholder1="Player name" placeholder2="Organization" onAdd={(a, b, amt) => update((d) => ({ ...d, golfPlayers: [...d.golfPlayers, { id: newId(), name: a, organization: b, amount: amt, paid: false }] }))} />
+              <AddTwo placeholder1="Player name" placeholder2="Organization" onAdd={(a, b, amt) => run(addRow("golf_players", { name: a, organization: b, amount: amt, paid: false }))} />
             </Card>
           </div>
         </TabsContent>
@@ -159,12 +159,12 @@ function GolfPage() {
                     <TableCell className="text-sm text-muted-foreground">{a.donor}</TableCell>
                     <TableCell className="text-sm">{a.type}</TableCell>
                     <TableCell className="text-right">{currency(a.estimatedValue)}</TableCell>
-                    <TableCell><Button variant="ghost" size="icon" onClick={() => update((d) => ({ ...d, golfAuction: d.golfAuction.filter((x) => x.id !== a.id) }))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                    <TableCell><Button variant="ghost" size="icon" onClick={() => run(removeRow("golf_auction", a.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            <AddAuction onAdd={(item, donor, value, type) => update((d) => ({ ...d, golfAuction: [...d.golfAuction, { id: newId(), item, donor, estimatedValue: value, type }] }))} />
+            <AddAuction onAdd={(item, donor, value, type) => run(addRow("golf_auction", { item, donor, estimatedValue: value, type }))} />
           </Card>
         </TabsContent>
 
@@ -178,12 +178,12 @@ function GolfPage() {
                     <TableCell className="font-medium">{e.item}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{e.category}</TableCell>
                     <TableCell className="text-right">{currency(e.amount)}</TableCell>
-                    <TableCell><Button variant="ghost" size="icon" onClick={() => update((d) => ({ ...d, golfExpenses: d.golfExpenses.filter((x) => x.id !== e.id) }))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                    <TableCell><Button variant="ghost" size="icon" onClick={() => run(removeRow("golf_expenses", e.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            <AddTwo placeholder1="Expense item" placeholder2="Category" onAdd={(a, b, amt) => update((d) => ({ ...d, golfExpenses: [...d.golfExpenses, { id: newId(), item: a, category: b, amount: amt }] }))} />
+            <AddTwo placeholder1="Expense item" placeholder2="Category" onAdd={(a, b, amt) => run(addRow("golf_expenses", { item: a, category: b, amount: amt }))} />
           </Card>
         </TabsContent>
       </Tabs>

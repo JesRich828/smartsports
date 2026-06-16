@@ -13,11 +13,12 @@ import {
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { ProgressRow } from "@/components/dashboard/ProgressRow";
-import { useStore } from "@/lib/store";
+import { toast } from "sonner";
+import { useDashboard } from "@/lib/db";
 import { currency, compactCurrency } from "@/lib/format";
 import type { BoardMember } from "@/lib/types";
 
-export const Route = createFileRoute("/board")({
+export const Route = createFileRoute("/_authenticated/board")({
   head: () => ({
     meta: [
       { title: "Board Dashboard — SMART Sports" },
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/board")({
 });
 
 function BoardPage() {
-  const { data, setData } = useStore();
+  const { data, saveRow } = useDashboard();
   const board = data.board;
 
   const totalGiven = board.reduce((s, b) => s + b.given, 0);
@@ -42,7 +43,9 @@ function BoardPage() {
     .reduce((s, g) => s + g.amountRequested, 0);
 
   function setMember(id: string, patch: Partial<BoardMember>) {
-    setData((prev) => ({ ...prev, board: prev.board.map((b) => (b.id === id ? { ...b, ...patch } : b)) }));
+    saveRow("board_members", id, patch).catch((e) =>
+      toast.error(e instanceof Error ? e.message : "Could not update board member"),
+    );
   }
 
   return (
@@ -84,11 +87,11 @@ function BoardPage() {
                   <TableCell className="font-medium">{b.name}</TableCell>
                   <TableCell className="text-right text-muted-foreground">{currency(b.giveGoal)}</TableCell>
                   <TableCell className="text-right">
-                    <Input type="number" value={b.given} onChange={(e) => setMember(b.id, { given: Number(e.target.value) })} className="h-8 w-24 text-right" />
+                    <Input type="number" defaultValue={b.given} onBlur={(e) => setMember(b.id, { given: Number(e.target.value) })} className="h-8 w-24 text-right" />
                   </TableCell>
                   {(["introductions", "meetingsScheduled", "prospectsAssigned", "sponsorOutreach"] as const).map((key) => (
                     <TableCell key={key} className="text-center">
-                      <Input type="number" value={b[key]} onChange={(e) => setMember(b.id, { [key]: Number(e.target.value) } as Partial<BoardMember>)} className="mx-auto h-8 w-16 text-center" />
+                      <Input type="number" defaultValue={b[key]} onBlur={(e) => setMember(b.id, { [key]: Number(e.target.value) } as Partial<BoardMember>)} className="mx-auto h-8 w-16 text-center" />
                     </TableCell>
                   ))}
                 </TableRow>

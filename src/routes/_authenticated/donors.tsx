@@ -32,11 +32,11 @@ import {
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
-import { useStore, newId } from "@/lib/store";
+import { useDashboard, newId } from "@/lib/db";
 import { currency, formatDate, compactCurrency } from "@/lib/format";
 import { DONOR_TYPES, DONOR_STAGES, type Donor } from "@/lib/types";
 
-export const Route = createFileRoute("/donors")({
+export const Route = createFileRoute("/_authenticated/donors")({
   head: () => ({
     meta: [
       { title: "Donor & Prospect CRM — SMART Sports" },
@@ -64,7 +64,7 @@ function emptyDonor(): Donor {
 }
 
 function DonorsPage() {
-  const { data, setData } = useStore();
+  const { data, addRow, saveRow, removeRow } = useDashboard();
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [editing, setEditing] = useState<Donor | null>(null);
@@ -88,22 +88,26 @@ function DonorsPage() {
 
   function openNew() { setEditing(emptyDonor()); setOpen(true); }
   function openEdit(d: Donor) { setEditing({ ...d }); setOpen(true); }
-  function save() {
+  async function save() {
     if (!editing) return;
     if (!editing.name.trim()) { toast.error("Name is required"); return; }
-    setData((prev) => {
-      const exists = prev.donors.some((d) => d.id === editing.id);
-      return {
-        ...prev,
-        donors: exists ? prev.donors.map((d) => (d.id === editing.id ? editing : d)) : [editing, ...prev.donors],
-      };
-    });
-    toast.success("Contact saved");
-    setOpen(false);
+    try {
+      const exists = data.donors.some((d) => d.id === editing.id);
+      if (exists) await saveRow("donors", editing.id, editing);
+      else await addRow("donors", editing);
+      toast.success("Contact saved");
+      setOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save contact");
+    }
   }
-  function remove(id: string) {
-    setData((prev) => ({ ...prev, donors: prev.donors.filter((d) => d.id !== id) }));
-    toast.success("Contact removed");
+  async function remove(id: string) {
+    try {
+      await removeRow("donors", id);
+      toast.success("Contact removed");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not remove contact");
+    }
   }
 
   const set = (patch: Partial<Donor>) => editing && setEditing({ ...editing, ...patch });

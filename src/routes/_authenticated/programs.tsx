@@ -3,11 +3,11 @@ import { BookOpen, FlaskConical, GraduationCap, Building2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
-import { useStore } from "@/lib/store";
+import { useDashboard } from "@/lib/db";
 import { currency, compactCurrency } from "@/lib/format";
 import { PROGRAMS } from "@/lib/types";
 
-export const Route = createFileRoute("/programs")({
+export const Route = createFileRoute("/_authenticated/programs")({
   head: () => ({
     meta: [
       { title: "Programs Dashboard — SMART Sports" },
@@ -25,7 +25,7 @@ const icons: Record<string, typeof BookOpen> = {
 };
 
 function ProgramsPage() {
-  const { data } = useStore();
+  const { data } = useDashboard();
 
   const summaries = PROGRAMS.map((program) => {
     const grants = data.grants.filter((g) => g.programFit === program);

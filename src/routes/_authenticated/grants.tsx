@@ -34,7 +34,7 @@ import {
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
-import { useStore, newId } from "@/lib/store";
+import { useDashboard, newId } from "@/lib/db";
 import { currency, formatDate, compactCurrency } from "@/lib/format";
 import {
   GRANT_STATUSES,
@@ -43,7 +43,7 @@ import {
   type Grant,
 } from "@/lib/types";
 
-export const Route = createFileRoute("/grants")({
+export const Route = createFileRoute("/_authenticated/grants")({
   head: () => ({
     meta: [
       { title: "Grant Tracking — SMART Sports FY26" },
@@ -84,7 +84,7 @@ function emptyGrant(): Grant {
 }
 
 function GrantsPage() {
-  const { data, setData } = useStore();
+  const { data, addRow, saveRow, removeRow } = useDashboard();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editing, setEditing] = useState<Grant | null>(null);
@@ -116,27 +116,29 @@ function GrantsPage() {
     setEditing({ ...g });
     setOpen(true);
   }
-  function save() {
+  async function save() {
     if (!editing) return;
     if (!editing.funderName.trim()) {
       toast.error("Funder name is required");
       return;
     }
-    setData((prev) => {
-      const exists = prev.grants.some((g) => g.id === editing.id);
-      return {
-        ...prev,
-        grants: exists
-          ? prev.grants.map((g) => (g.id === editing.id ? editing : g))
-          : [editing, ...prev.grants],
-      };
-    });
-    toast.success("Grant saved");
-    setOpen(false);
+    try {
+      const exists = data.grants.some((g) => g.id === editing.id);
+      if (exists) await saveRow("grants", editing.id, editing);
+      else await addRow("grants", editing);
+      toast.success("Grant saved");
+      setOpen(false);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save grant");
+    }
   }
-  function remove(id: string) {
-    setData((prev) => ({ ...prev, grants: prev.grants.filter((g) => g.id !== id) }));
-    toast.success("Grant removed");
+  async function remove(id: string) {
+    try {
+      await removeRow("grants", id);
+      toast.success("Grant removed");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not remove grant");
+    }
   }
 
   return (

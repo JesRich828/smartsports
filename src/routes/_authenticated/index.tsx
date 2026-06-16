@@ -20,10 +20,10 @@ import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { ProgressRow } from "@/components/dashboard/ProgressRow";
-import { useStore } from "@/lib/store";
+import { useDashboard } from "@/lib/db";
 import { currency, compactCurrency, pct } from "@/lib/format";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "Executive Dashboard — SMART Sports FY26" },
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { data } = useStore();
+  const { data } = useDashboard();
   const { goals } = data;
 
   const totalRaised = goals.channels.reduce((s, c) => s + c.raised, 0);

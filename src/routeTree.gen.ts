@@ -10,127 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as ProgramsRouteImport } from './routes/programs'
-import { Route as GrantsRouteImport } from './routes/grants'
-import { Route as GolfRouteImport } from './routes/golf'
-import { Route as DonorsRouteImport } from './routes/donors'
-import { Route as BoardRouteImport } from './routes/board'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedProgramsRouteImport } from './routes/_authenticated/programs'
+import { Route as AuthenticatedGrantsRouteImport } from './routes/_authenticated/grants'
+import { Route as AuthenticatedGolfRouteImport } from './routes/_authenticated/golf'
+import { Route as AuthenticatedDonorsRouteImport } from './routes/_authenticated/donors'
+import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProgramsRoute = ProgramsRouteImport.update({
-  id: '/programs',
-  path: '/programs',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GrantsRoute = GrantsRouteImport.update({
-  id: '/grants',
-  path: '/grants',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GolfRoute = GolfRouteImport.update({
-  id: '/golf',
-  path: '/golf',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DonorsRoute = DonorsRouteImport.update({
-  id: '/donors',
-  path: '/donors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BoardRoute = BoardRouteImport.update({
-  id: '/board',
-  path: '/board',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProgramsRoute = AuthenticatedProgramsRouteImport.update({
+  id: '/programs',
+  path: '/programs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGrantsRoute = AuthenticatedGrantsRouteImport.update({
+  id: '/grants',
+  path: '/grants',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedGolfRoute = AuthenticatedGolfRouteImport.update({
+  id: '/golf',
+  path: '/golf',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDonorsRoute = AuthenticatedDonorsRouteImport.update({
+  id: '/donors',
+  path: '/donors',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBoardRoute = AuthenticatedBoardRouteImport.update({
+  id: '/board',
+  path: '/board',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/board': typeof BoardRoute
-  '/donors': typeof DonorsRoute
-  '/golf': typeof GolfRoute
-  '/grants': typeof GrantsRoute
-  '/programs': typeof ProgramsRoute
-  '/reports': typeof ReportsRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/board': typeof AuthenticatedBoardRoute
+  '/donors': typeof AuthenticatedDonorsRoute
+  '/golf': typeof AuthenticatedGolfRoute
+  '/grants': typeof AuthenticatedGrantsRoute
+  '/programs': typeof AuthenticatedProgramsRoute
+  '/reports': typeof AuthenticatedReportsRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/board': typeof BoardRoute
-  '/donors': typeof DonorsRoute
-  '/golf': typeof GolfRoute
-  '/grants': typeof GrantsRoute
-  '/programs': typeof ProgramsRoute
-  '/reports': typeof ReportsRoute
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/board': typeof AuthenticatedBoardRoute
+  '/donors': typeof AuthenticatedDonorsRoute
+  '/golf': typeof AuthenticatedGolfRoute
+  '/grants': typeof AuthenticatedGrantsRoute
+  '/programs': typeof AuthenticatedProgramsRoute
+  '/reports': typeof AuthenticatedReportsRoute
+  '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/board': typeof BoardRoute
-  '/donors': typeof DonorsRoute
-  '/golf': typeof GolfRoute
-  '/grants': typeof GrantsRoute
-  '/programs': typeof ProgramsRoute
-  '/reports': typeof ReportsRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/board': typeof AuthenticatedBoardRoute
+  '/_authenticated/donors': typeof AuthenticatedDonorsRoute
+  '/_authenticated/golf': typeof AuthenticatedGolfRoute
+  '/_authenticated/grants': typeof AuthenticatedGrantsRoute
+  '/_authenticated/programs': typeof AuthenticatedProgramsRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
+    | '/sitemap.xml'
     | '/board'
     | '/donors'
     | '/golf'
     | '/grants'
     | '/programs'
     | '/reports'
-    | '/sitemap.xml'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/auth'
+    | '/sitemap.xml'
     | '/board'
     | '/donors'
     | '/golf'
     | '/grants'
     | '/programs'
     | '/reports'
-    | '/sitemap.xml'
+    | '/'
   id:
     | '__root__'
-    | '/'
-    | '/board'
-    | '/donors'
-    | '/golf'
-    | '/grants'
-    | '/programs'
-    | '/reports'
+    | '/_authenticated'
+    | '/auth'
     | '/sitemap.xml'
+    | '/_authenticated/board'
+    | '/_authenticated/donors'
+    | '/_authenticated/golf'
+    | '/_authenticated/grants'
+    | '/_authenticated/programs'
+    | '/_authenticated/reports'
+    | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  BoardRoute: typeof BoardRoute
-  DonorsRoute: typeof DonorsRoute
-  GolfRoute: typeof GolfRoute
-  GrantsRoute: typeof GrantsRoute
-  ProgramsRoute: typeof ProgramsRoute
-  ReportsRoute: typeof ReportsRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -143,66 +157,98 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/programs': {
-      id: '/programs'
-      path: '/programs'
-      fullPath: '/programs'
-      preLoaderRoute: typeof ProgramsRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/grants': {
-      id: '/grants'
-      path: '/grants'
-      fullPath: '/grants'
-      preLoaderRoute: typeof GrantsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/golf': {
-      id: '/golf'
-      path: '/golf'
-      fullPath: '/golf'
-      preLoaderRoute: typeof GolfRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/donors': {
-      id: '/donors'
-      path: '/donors'
-      fullPath: '/donors'
-      preLoaderRoute: typeof DonorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/board': {
-      id: '/board'
-      path: '/board'
-      fullPath: '/board'
-      preLoaderRoute: typeof BoardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programs': {
+      id: '/_authenticated/programs'
+      path: '/programs'
+      fullPath: '/programs'
+      preLoaderRoute: typeof AuthenticatedProgramsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/grants': {
+      id: '/_authenticated/grants'
+      path: '/grants'
+      fullPath: '/grants'
+      preLoaderRoute: typeof AuthenticatedGrantsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/golf': {
+      id: '/_authenticated/golf'
+      path: '/golf'
+      fullPath: '/golf'
+      preLoaderRoute: typeof AuthenticatedGolfRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/donors': {
+      id: '/_authenticated/donors'
+      path: '/donors'
+      fullPath: '/donors'
+      preLoaderRoute: typeof AuthenticatedDonorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/board': {
+      id: '/_authenticated/board'
+      path: '/board'
+      fullPath: '/board'
+      preLoaderRoute: typeof AuthenticatedBoardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
+  AuthenticatedDonorsRoute: typeof AuthenticatedDonorsRoute
+  AuthenticatedGolfRoute: typeof AuthenticatedGolfRoute
+  AuthenticatedGrantsRoute: typeof AuthenticatedGrantsRoute
+  AuthenticatedProgramsRoute: typeof AuthenticatedProgramsRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBoardRoute: AuthenticatedBoardRoute,
+  AuthenticatedDonorsRoute: AuthenticatedDonorsRoute,
+  AuthenticatedGolfRoute: AuthenticatedGolfRoute,
+  AuthenticatedGrantsRoute: AuthenticatedGrantsRoute,
+  AuthenticatedProgramsRoute: AuthenticatedProgramsRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  BoardRoute: BoardRoute,
-  DonorsRoute: DonorsRoute,
-  GolfRoute: GolfRoute,
-  GrantsRoute: GrantsRoute,
-  ProgramsRoute: ProgramsRoute,
-  ReportsRoute: ReportsRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
