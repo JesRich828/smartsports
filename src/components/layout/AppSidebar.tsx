@@ -8,6 +8,7 @@ import {
   Briefcase,
   BarChart3,
   Sparkles,
+  BellRing,
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,6 +32,7 @@ const items = [
   { title: "Board Dashboard", url: "/board", icon: Briefcase },
   { title: "Reports", url: "/reports", icon: BarChart3 },
   { title: "AI Assistants", url: "/assistants", icon: Sparkles },
+  { title: "Automations", url: "/automations", icon: BellRing },
 ];
 
 export function AppSidebar() {
