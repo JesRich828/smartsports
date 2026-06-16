@@ -45,14 +45,19 @@ function AuthPage() {
         if (error) throw error;
         navigate({ to: "/" });
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        toast.success("Account created! Check your email to confirm, then sign in.");
-        setMode("signin");
+        if (signUpData.session) {
+          toast.success("Account created!");
+          navigate({ to: "/" });
+        } else {
+          toast.success("Account created! Please sign in.");
+          setMode("signin");
+        }
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
