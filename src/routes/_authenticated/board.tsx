@@ -87,11 +87,11 @@ function BoardPage() {
                   <TableCell className="font-medium">{b.name}</TableCell>
                   <TableCell className="text-right text-muted-foreground">{currency(b.giveGoal)}</TableCell>
                   <TableCell className="text-right">
-                    <Input type="number" value={b.given} onChange={(e) => setMember(b.id, { given: Number(e.target.value) })} className="h-8 w-24 text-right" />
+                    <Input type="number" defaultValue={b.given} onBlur={(e) => setMember(b.id, { given: Number(e.target.value) })} className="h-8 w-24 text-right" />
                   </TableCell>
                   {(["introductions", "meetingsScheduled", "prospectsAssigned", "sponsorOutreach"] as const).map((key) => (
                     <TableCell key={key} className="text-center">
-                      <Input type="number" value={b[key]} onChange={(e) => setMember(b.id, { [key]: Number(e.target.value) } as Partial<BoardMember>)} className="mx-auto h-8 w-16 text-center" />
+                      <Input type="number" defaultValue={b[key]} onBlur={(e) => setMember(b.id, { [key]: Number(e.target.value) } as Partial<BoardMember>)} className="mx-auto h-8 w-16 text-center" />
                     </TableCell>
                   ))}
                 </TableRow>
