@@ -5,6 +5,7 @@ import type { AppData, Goals } from "./types";
 export type TableName =
   | "grants"
   | "donors"
+  | "sponsors"
   | "golf_sponsors"
   | "golf_foursomes"
   | "golf_players"
@@ -27,6 +28,7 @@ const defaultGoals: Goals = {
 export const emptyData: AppData = {
   grants: [],
   donors: [],
+  sponsors: [],
   golfSponsors: [],
   golfFoursomes: [],
   golfPlayers: [],
@@ -44,9 +46,10 @@ function strip<T extends Record<string, unknown>>(row: T) {
 }
 
 async function fetchAll(): Promise<AppData> {
-  const [grants, donors, gs, gf, gp, ga, ge, board, goals] = await Promise.all([
+  const [grants, donors, sponsors, gs, gf, gp, ga, ge, board, goals] = await Promise.all([
     supabase.from("grants").select("*").order("created_at", { ascending: true }),
     supabase.from("donors").select("*").order("created_at", { ascending: true }),
+    supabase.from("sponsors").select("*").order("created_at", { ascending: true }),
     supabase.from("golf_sponsors").select("*").order("created_at", { ascending: true }),
     supabase.from("golf_foursomes").select("*").order("created_at", { ascending: true }),
     supabase.from("golf_players").select("*").order("created_at", { ascending: true }),
@@ -57,13 +60,14 @@ async function fetchAll(): Promise<AppData> {
   ]);
 
   const firstError =
-    grants.error || donors.error || gs.error || gf.error || gp.error ||
+    grants.error || donors.error || sponsors.error || gs.error || gf.error || gp.error ||
     ga.error || ge.error || board.error || goals.error;
   if (firstError) throw firstError;
 
   return {
     grants: (grants.data ?? []) as AppData["grants"],
     donors: (donors.data ?? []) as AppData["donors"],
+    sponsors: (sponsors.data ?? []) as AppData["sponsors"],
     golfSponsors: (gs.data ?? []) as AppData["golfSponsors"],
     golfFoursomes: (gf.data ?? []) as AppData["golfFoursomes"],
     golfPlayers: (gp.data ?? []) as AppData["golfPlayers"],

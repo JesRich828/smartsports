@@ -109,6 +109,33 @@ export interface GolfSponsor {
   followUp: string;
 }
 
+export const SPONSOR_STATUSES = [
+  "Prospect",
+  "Contacted",
+  "In Discussion",
+  "Verbal Commitment",
+  "Committed",
+  "Declined",
+] as const;
+export type SponsorStatus = (typeof SPONSOR_STATUSES)[number];
+
+export const CORPORATE_SPONSOR_LEVELS = [
+  "Platinum",
+  "Gold",
+  "Silver",
+  "Bronze",
+  "In-Kind",
+] as const;
+
+export interface Sponsor {
+  id: string;
+  company: string;
+  sponsorship_level: string;
+  commitment: number;
+  status: SponsorStatus | string;
+  contact: string;
+}
+
 export interface GolfFoursome {
   id: string;
   captain: string;
@@ -164,6 +191,7 @@ export interface Goals {
 export interface AppData {
   grants: Grant[];
   donors: Donor[];
+  sponsors: Sponsor[];
   golfSponsors: GolfSponsor[];
   golfFoursomes: GolfFoursome[];
   golfPlayers: GolfPlayer[];
