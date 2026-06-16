@@ -193,7 +193,7 @@ function GolfPage() {
 
 function AddSponsor({ onAdd }: { onAdd: (name: string, level: string, amount: number, followUp: string) => void }) {
   const [name, setName] = useState("");
-  const [level, setLevel] = useState(SPONSOR_LEVELS[0].name);
+  const [level, setLevel] = useState<string>(SPONSOR_LEVELS[0].name);
   const [followUp, setFollowUp] = useState("");
   const amount = SPONSOR_LEVELS.find((l) => l.name === level)?.amount ?? 0;
   return (
