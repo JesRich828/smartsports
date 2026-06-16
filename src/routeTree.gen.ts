@@ -19,6 +19,7 @@ import { Route as AuthenticatedGrantsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedGolfRouteImport } from './routes/_authenticated/golf'
 import { Route as AuthenticatedDonorsRouteImport } from './routes/_authenticated/donors'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
+import { Route as AuthenticatedAutomationsRouteImport } from './routes/_authenticated/automations'
 import { Route as AuthenticatedAssistantsRouteImport } from './routes/_authenticated/assistants'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -70,6 +71,12 @@ const AuthenticatedBoardRoute = AuthenticatedBoardRouteImport.update({
   path: '/board',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAutomationsRoute =
+  AuthenticatedAutomationsRouteImport.update({
+    id: '/automations',
+    path: '/automations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAssistantsRoute = AuthenticatedAssistantsRouteImport.update({
   id: '/assistants',
   path: '/assistants',
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/assistants': typeof AuthenticatedAssistantsRoute
+  '/automations': typeof AuthenticatedAutomationsRoute
   '/board': typeof AuthenticatedBoardRoute
   '/donors': typeof AuthenticatedDonorsRoute
   '/golf': typeof AuthenticatedGolfRoute
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/assistants': typeof AuthenticatedAssistantsRoute
+  '/automations': typeof AuthenticatedAutomationsRoute
   '/board': typeof AuthenticatedBoardRoute
   '/donors': typeof AuthenticatedDonorsRoute
   '/golf': typeof AuthenticatedGolfRoute
@@ -106,6 +115,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/assistants': typeof AuthenticatedAssistantsRoute
+  '/_authenticated/automations': typeof AuthenticatedAutomationsRoute
   '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/_authenticated/donors': typeof AuthenticatedDonorsRoute
   '/_authenticated/golf': typeof AuthenticatedGolfRoute
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/assistants'
+    | '/automations'
     | '/board'
     | '/donors'
     | '/golf'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/assistants'
+    | '/automations'
     | '/board'
     | '/donors'
     | '/golf'
@@ -145,6 +157,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/sitemap.xml'
     | '/_authenticated/assistants'
+    | '/_authenticated/automations'
     | '/_authenticated/board'
     | '/_authenticated/donors'
     | '/_authenticated/golf'
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBoardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/automations': {
+      id: '/_authenticated/automations'
+      path: '/automations'
+      fullPath: '/automations'
+      preLoaderRoute: typeof AuthenticatedAutomationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/assistants': {
       id: '/_authenticated/assistants'
       path: '/assistants'
@@ -244,6 +264,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAssistantsRoute: typeof AuthenticatedAssistantsRoute
+  AuthenticatedAutomationsRoute: typeof AuthenticatedAutomationsRoute
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
   AuthenticatedDonorsRoute: typeof AuthenticatedDonorsRoute
   AuthenticatedGolfRoute: typeof AuthenticatedGolfRoute
@@ -255,6 +276,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAssistantsRoute: AuthenticatedAssistantsRoute,
+  AuthenticatedAutomationsRoute: AuthenticatedAutomationsRoute,
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
   AuthenticatedDonorsRoute: AuthenticatedDonorsRoute,
   AuthenticatedGolfRoute: AuthenticatedGolfRoute,
