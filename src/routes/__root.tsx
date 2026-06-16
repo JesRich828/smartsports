@@ -94,6 +94,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "SMART Sports — FY26 Fundraising Dashboard" },
+      { name: "description", content: "SMART Sports Compass is a web-based dashboard for nonprofit fundraising management." },
+      { property: "og:description", content: "SMART Sports Compass is a web-based dashboard for nonprofit fundraising management." },
+      { name: "twitter:description", content: "SMART Sports Compass is a web-based dashboard for nonprofit fundraising management." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/37c6ecab-3f6c-42df-bb55-282f40d90b7c/id-preview-08129f3f--1e7c0402-3b63-429d-97e3-7f34fd76fcc0.lovable.app-1781650858056.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/37c6ecab-3f6c-42df-bb55-282f40d90b7c/id-preview-08129f3f--1e7c0402-3b63-429d-97e3-7f34fd76fcc0.lovable.app-1781650858056.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
