@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as GrantsRouteImport } from './routes/grants'
+import { Route as DonorsRouteImport } from './routes/donors'
 import { Route as IndexRouteImport } from './routes/index'
 
 const GrantsRoute = GrantsRouteImport.update({
   id: '/grants',
   path: '/grants',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DonorsRoute = DonorsRouteImport.update({
+  id: '/donors',
+  path: '/donors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,27 +31,31 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/donors': typeof DonorsRoute
   '/grants': typeof GrantsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/donors': typeof DonorsRoute
   '/grants': typeof GrantsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/donors': typeof DonorsRoute
   '/grants': typeof GrantsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/grants'
+  fullPaths: '/' | '/donors' | '/grants'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/grants'
-  id: '__root__' | '/' | '/grants'
+  to: '/' | '/donors' | '/grants'
+  id: '__root__' | '/' | '/donors' | '/grants'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DonorsRoute: typeof DonorsRoute
   GrantsRoute: typeof GrantsRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/grants'
       fullPath: '/grants'
       preLoaderRoute: typeof GrantsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/donors': {
+      id: '/donors'
+      path: '/donors'
+      fullPath: '/donors'
+      preLoaderRoute: typeof DonorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DonorsRoute: DonorsRoute,
   GrantsRoute: GrantsRoute,
 }
 export const routeTree = rootRouteImport
