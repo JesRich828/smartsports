@@ -11,6 +11,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { StoreProvider } from "../lib/store";
+import { AppSidebar } from "../components/layout/AppSidebar";
+import { SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -131,8 +135,26 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <StoreProvider>
+        <SidebarProvider>
+          <div className="flex min-h-screen w-full bg-background">
+            <AppSidebar />
+            <div className="flex flex-1 flex-col min-w-0">
+              <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/80 px-4 backdrop-blur">
+                <SidebarTrigger />
+                <span className="font-display text-sm font-semibold text-foreground">
+                  SMART Sports — Fundraising Command Center
+                </span>
+              </header>
+              <main className="flex-1 p-4 md:p-6">
+                {/* Required: nested routes render here. */}
+                <Outlet />
+              </main>
+            </div>
+          </div>
+          <Toaster richColors position="top-right" />
+        </SidebarProvider>
+      </StoreProvider>
     </QueryClientProvider>
   );
 }
