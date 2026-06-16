@@ -19,6 +19,7 @@ import { Route as AuthenticatedGrantsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedGolfRouteImport } from './routes/_authenticated/golf'
 import { Route as AuthenticatedDonorsRouteImport } from './routes/_authenticated/donors'
 import { Route as AuthenticatedBoardRouteImport } from './routes/_authenticated/board'
+import { Route as AuthenticatedAssistantsRouteImport } from './routes/_authenticated/assistants'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -69,11 +70,17 @@ const AuthenticatedBoardRoute = AuthenticatedBoardRouteImport.update({
   path: '/board',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAssistantsRoute = AuthenticatedAssistantsRouteImport.update({
+  id: '/assistants',
+  path: '/assistants',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/assistants': typeof AuthenticatedAssistantsRoute
   '/board': typeof AuthenticatedBoardRoute
   '/donors': typeof AuthenticatedDonorsRoute
   '/golf': typeof AuthenticatedGolfRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/assistants': typeof AuthenticatedAssistantsRoute
   '/board': typeof AuthenticatedBoardRoute
   '/donors': typeof AuthenticatedDonorsRoute
   '/golf': typeof AuthenticatedGolfRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/assistants': typeof AuthenticatedAssistantsRoute
   '/_authenticated/board': typeof AuthenticatedBoardRoute
   '/_authenticated/donors': typeof AuthenticatedDonorsRoute
   '/_authenticated/golf': typeof AuthenticatedGolfRoute
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/sitemap.xml'
+    | '/assistants'
     | '/board'
     | '/donors'
     | '/golf'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
   to:
     | '/auth'
     | '/sitemap.xml'
+    | '/assistants'
     | '/board'
     | '/donors'
     | '/golf'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/sitemap.xml'
+    | '/_authenticated/assistants'
     | '/_authenticated/board'
     | '/_authenticated/donors'
     | '/_authenticated/golf'
@@ -220,10 +232,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBoardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/assistants': {
+      id: '/_authenticated/assistants'
+      path: '/assistants'
+      fullPath: '/assistants'
+      preLoaderRoute: typeof AuthenticatedAssistantsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAssistantsRoute: typeof AuthenticatedAssistantsRoute
   AuthenticatedBoardRoute: typeof AuthenticatedBoardRoute
   AuthenticatedDonorsRoute: typeof AuthenticatedDonorsRoute
   AuthenticatedGolfRoute: typeof AuthenticatedGolfRoute
@@ -234,6 +254,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAssistantsRoute: AuthenticatedAssistantsRoute,
   AuthenticatedBoardRoute: AuthenticatedBoardRoute,
   AuthenticatedDonorsRoute: AuthenticatedDonorsRoute,
   AuthenticatedGolfRoute: AuthenticatedGolfRoute,

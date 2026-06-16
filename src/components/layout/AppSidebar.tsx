@@ -7,6 +7,7 @@ import {
   BookOpen,
   Briefcase,
   BarChart3,
+  Sparkles,
 } from "lucide-react";
 import {
   Sidebar,
@@ -29,6 +30,7 @@ const items = [
   { title: "Programs", url: "/programs", icon: BookOpen },
   { title: "Board Dashboard", url: "/board", icon: Briefcase },
   { title: "Reports", url: "/reports", icon: BarChart3 },
+  { title: "AI Assistants", url: "/assistants", icon: Sparkles },
 ];
 
 export function AppSidebar() {
