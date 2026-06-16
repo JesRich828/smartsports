@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/table";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { useStore, newId } from "@/lib/store";
+import { useDashboard, newId } from "@/lib/db";
 import { currency, compactCurrency } from "@/lib/format";
 import { SPONSOR_LEVELS, type AppData } from "@/lib/types";
 

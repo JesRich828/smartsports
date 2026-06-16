@@ -32,7 +32,7 @@ import {
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
-import { useStore, newId } from "@/lib/store";
+import { useDashboard, newId } from "@/lib/db";
 import { currency, formatDate, compactCurrency } from "@/lib/format";
 import { DONOR_TYPES, DONOR_STAGES, type Donor } from "@/lib/types";
 

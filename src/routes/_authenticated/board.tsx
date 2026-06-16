@@ -13,7 +13,7 @@ import {
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { ProgressRow } from "@/components/dashboard/ProgressRow";
-import { useStore } from "@/lib/store";
+import { useDashboard } from "@/lib/db";
 import { currency, compactCurrency } from "@/lib/format";
 import type { BoardMember } from "@/lib/types";
 
