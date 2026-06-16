@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   TrendingUp,
-  Wallet,
-  Gift,
-  Receipt,
-  PiggyBank,
-  Target,
+  FileText,
+  Users,
+  Building2,
+  Flag,
+  Handshake,
+  CalendarClock,
+  AlertTriangle,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -15,13 +17,16 @@ import {
   YAxis,
   Tooltip,
   Cell,
+  PieChart,
+  Pie,
+  Legend,
+  CartesianGrid,
 } from "recharts";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { ProgressRow } from "@/components/dashboard/ProgressRow";
 import { useDashboard } from "@/lib/db";
-import { currency, compactCurrency, pct } from "@/lib/format";
+import { currency, compactCurrency, formatDate, daysUntil } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -35,26 +40,77 @@ export const Route = createFileRoute("/_authenticated/")({
   component: Index,
 });
 
+const CLOSED_GRANT = new Set(["Awarded", "Declined", "Closed"]);
+const WON_DONOR = new Set(["Closed - Won", "Closed - Lost"]);
+const COMMITTED_SPONSOR = new Set(["Committed", "Declined"]);
+
 function Index() {
   const { data } = useDashboard();
-  const { goals } = data;
 
-  const totalRaised = goals.channels.reduce((s, c) => s + c.raised, 0);
-  const cashOnHand = totalRaised;
-  const inKindRaised = data.golfAuction
-    .filter((a) => a.type === "In-kind")
-    .reduce((s, a) => s + a.estimatedValue, 0);
-  const surplus = goals.totalRevenueGoal - goals.totalExpenses;
+  // Golf event revenue: sponsors + foursomes + players + auction
+  const golfSponsorRev = data.golfSponsors.reduce((s, g) => s + (g.amount || 0), 0);
+  const golfFoursomeRev = data.golfFoursomes.reduce((s, g) => s + (g.amount || 0), 0);
+  const golfPlayerRev = data.golfPlayers.reduce((s, g) => s + (g.amount || 0), 0);
+  const golfAuctionRev = data.golfAuction.reduce((s, a) => s + (a.estimatedValue || 0), 0);
+  const golfRevenue = golfSponsorRev + golfFoursomeRev + golfPlayerRev + golfAuctionRev;
 
-  const chartColors = [
-    "var(--navy)",
-    "var(--orange)",
-    "var(--green)",
-    "oklch(0.58 0.1 230)",
-    "oklch(0.78 0.15 75)",
-    "oklch(0.5 0.08 300)",
+  // Grant pipeline: open (not closed) requested value
+  const grantPipeline = data.grants
+    .filter((g) => !CLOSED_GRANT.has(g.status))
+    .reduce((s, g) => s + (g.amountRequested || 0), 0);
+  const grantsAwarded = data.grants
+    .filter((g) => g.status === "Awarded")
+    .reduce((s, g) => s + (g.awardAmount || 0), 0);
+
+  // Major donor pipeline: open ask amounts for major gift prospects
+  const donorPipeline = data.donors
+    .filter((d) => !WON_DONOR.has(d.stage))
+    .reduce((s, d) => s + (d.askAmount || 0), 0);
+
+  // Corporate sponsor pipeline: open commitments
+  const sponsorPipeline = data.sponsors
+    .filter((s) => !COMMITTED_SPONSOR.has(s.status))
+    .reduce((sum, s) => sum + (s.commitment || 0), 0);
+  const sponsorsCommitted = data.sponsors
+    .filter((s) => s.status === "Committed")
+    .reduce((sum, s) => sum + (s.commitment || 0), 0);
+
+  // Board introductions
+  const boardIntros = data.board.reduce((s, b) => s + (b.introductions || 0), 0);
+
+  // Total revenue raised: awarded grants + committed sponsors + golf revenue + closed-won donors
+  const donorsWon = data.donors
+    .filter((d) => d.stage === "Closed - Won")
+    .reduce((s, d) => s + (d.askAmount || 0), 0);
+  const totalRaised = grantsAwarded + sponsorsCommitted + golfRevenue + donorsWon;
+
+  // Upcoming deadlines from grant dates
+  type Deadline = { label: string; date: string; kind: string };
+  const deadlines: Deadline[] = [];
+  for (const g of data.grants) {
+    if (g.loiDueDate) deadlines.push({ label: g.funderName, date: g.loiDueDate, kind: "LOI Due" });
+    if (g.applicationDueDate) deadlines.push({ label: g.funderName, date: g.applicationDueDate, kind: "Application Due" });
+    if (g.reportDueDate) deadlines.push({ label: g.funderName, date: g.reportDueDate, kind: "Report Due" });
+    if (!g.loiDueDate && !g.applicationDueDate && g.deadline) deadlines.push({ label: g.funderName, date: g.deadline, kind: "Deadline" });
+  }
+  const upcoming = deadlines
+    .map((d) => ({ ...d, days: daysUntil(d.date) }))
+    .filter((d) => d.days !== null && d.days >= 0)
+    .sort((a, b) => (a.days ?? 0) - (b.days ?? 0))
+    .slice(0, 6);
+
+  // Pipeline by source chart
+  const pipelineData = [
+    { name: "Grants", value: grantPipeline },
+    { name: "Major Donors", value: donorPipeline },
+    { name: "Corp. Sponsors", value: sponsorPipeline },
+    { name: "Golf Event", value: golfRevenue },
   ];
-  const chartData = goals.channels.map((c) => ({ name: c.name, raised: c.raised, goal: c.goal }));
+
+  // Revenue raised vs pipeline (potential)
+  const totalPipeline = grantPipeline + donorPipeline + sponsorPipeline;
+
+  const pieColors = ["var(--navy)", "var(--orange)", "var(--green)", "oklch(0.58 0.1 230)"];
 
   return (
     <div>
@@ -64,83 +120,167 @@ function Index() {
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
-        <StatCard label="FY26 Revenue Goal" value={currency(goals.totalRevenueGoal)} accent="navy" icon={<Target className="h-5 w-5" />} />
-        <StatCard label="Cash Revenue Goal" value={currency(goals.cashGoal)} accent="orange" icon={<Wallet className="h-5 w-5" />} />
-        <StatCard label="In-Kind Support" value={currency(goals.inKindGoal)} accent="green" icon={<Gift className="h-5 w-5" />} />
-        <StatCard label="Total Expenses" value={currency(goals.totalExpenses)} accent="muted" icon={<Receipt className="h-5 w-5" />} />
-        <StatCard label="Projected Surplus" value={currency(surplus)} accent="green" icon={<PiggyBank className="h-5 w-5" />} />
         <StatCard
-          label="Raised to Date"
+          label="Total Revenue Raised"
           value={currency(totalRaised)}
-          sub={`${pct(totalRaised, goals.cashGoal)}% of cash goal`}
-          accent="navy"
+          sub="Awarded + committed + golf"
+          accent="green"
           icon={<TrendingUp className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Grant Pipeline"
+          value={currency(grantPipeline)}
+          sub={`${compactCurrency(grantsAwarded)} awarded`}
+          accent="navy"
+          icon={<FileText className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Major Donor Pipeline"
+          value={currency(donorPipeline)}
+          sub={`${data.donors.length} prospects`}
+          accent="orange"
+          icon={<Users className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Corporate Sponsor Pipeline"
+          value={currency(sponsorPipeline)}
+          sub={`${compactCurrency(sponsorsCommitted)} committed`}
+          accent="navy"
+          icon={<Building2 className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Golf Event Revenue"
+          value={currency(golfRevenue)}
+          sub={`${data.golfSponsors.length + data.golfFoursomes.length} commitments`}
+          accent="green"
+          icon={<Flag className="h-5 w-5" />}
+        />
+        <StatCard
+          label="Board Introductions"
+          value={String(boardIntros)}
+          sub={`Across ${data.board.length} members`}
+          accent="orange"
+          icon={<Handshake className="h-5 w-5" />}
         />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-5">
         <Card className="p-5 lg:col-span-3">
-          <h2 className="font-display text-lg font-semibold text-foreground">Revenue by Channel</h2>
-          <p className="mb-4 text-sm text-muted-foreground">Progress toward FY26 goals across all giving channels.</p>
-          <div className="space-y-4">
-            {goals.channels.map((c, i) => (
-              <ProgressRow
-                key={c.name}
-                label={c.name}
-                raised={c.raised}
-                goal={c.goal}
-                color={["bg-primary", "bg-accent", "bg-success", "bg-chart-4", "bg-chart-5", "bg-primary/70"][i % 6]}
-              />
-            ))}
-          </div>
-        </Card>
-
-        <Card className="p-5 lg:col-span-2">
-          <h2 className="font-display text-lg font-semibold text-foreground">Channel Comparison</h2>
-          <p className="mb-4 text-sm text-muted-foreground">Raised vs. goal by channel.</p>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={chartData} layout="vertical" margin={{ left: 8, right: 8 }}>
-              <XAxis type="number" hide />
-              <YAxis type="category" dataKey="name" width={96} tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
+          <h2 className="font-display text-lg font-semibold text-foreground">Pipeline by Source</h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Open opportunity value across each fundraising channel.
+          </p>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={pipelineData} margin={{ left: 8, right: 8, top: 8 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
+              <YAxis tickFormatter={(v) => compactCurrency(v)} tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} width={56} />
               <Tooltip
                 formatter={(v: number) => currency(v)}
                 contentStyle={{ borderRadius: 8, border: "1px solid var(--border)", fontSize: 12 }}
               />
-              <Bar dataKey="raised" radius={[0, 4, 4, 0]}>
-                {chartData.map((_, i) => (
-                  <Cell key={i} fill={chartColors[i % chartColors.length]} />
+              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                {pipelineData.map((_, i) => (
+                  <Cell key={i} fill={pieColors[i % pieColors.length]} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </Card>
+
+        <Card className="p-5 lg:col-span-2">
+          <h2 className="font-display text-lg font-semibold text-foreground">Pipeline Mix</h2>
+          <p className="mb-4 text-sm text-muted-foreground">Share of {compactCurrency(totalPipeline + golfRevenue)} total opportunity.</p>
+          <ResponsiveContainer width="100%" height={280}>
+            <PieChart>
+              <Pie
+                data={pipelineData}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={55}
+                outerRadius={90}
+                paddingAngle={2}
+              >
+                {pipelineData.map((_, i) => (
+                  <Cell key={i} fill={pieColors[i % pieColors.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(v: number) => currency(v)}
+                contentStyle={{ borderRadius: 8, border: "1px solid var(--border)", fontSize: 12 }}
+              />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+            </PieChart>
+          </ResponsiveContainer>
+        </Card>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <Card className="p-5">
-          <h3 className="font-display text-base font-semibold text-foreground">Cash vs. In-Kind</h3>
-          <div className="mt-3 space-y-3">
-            <ProgressRow label="Cash Revenue" raised={cashOnHand} goal={goals.cashGoal} color="bg-accent" />
-            <ProgressRow label="In-Kind Support" raised={inKindRaised || goals.inKindGoal * 0.4} goal={goals.inKindGoal} color="bg-success" />
+      <div className="mt-6 grid gap-4 lg:grid-cols-5">
+        <Card className="p-5 lg:col-span-3">
+          <div className="flex items-center gap-2">
+            <CalendarClock className="h-5 w-5 text-accent" />
+            <h2 className="font-display text-lg font-semibold text-foreground">Upcoming Deadlines</h2>
           </div>
+          <p className="mb-4 text-sm text-muted-foreground">Next grant LOIs, applications, and reports due.</p>
+          {upcoming.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">No upcoming deadlines.</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {upcoming.map((d, i) => (
+                <li key={i} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">{d.label}</p>
+                    <p className="text-xs text-muted-foreground">{d.kind} · {formatDate(d.date)}</p>
+                  </div>
+                  <span
+                    className={
+                      "shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold " +
+                      ((d.days ?? 99) <= 7
+                        ? "bg-destructive/10 text-destructive"
+                        : (d.days ?? 99) <= 30
+                          ? "bg-accent/15 text-accent"
+                          : "bg-muted text-muted-foreground")
+                    }
+                  >
+                    {d.days === 0 ? "Today" : `${d.days}d`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </Card>
-        <Card className="p-5">
-          <h3 className="font-display text-base font-semibold text-foreground">Budget Health</h3>
-          <dl className="mt-3 space-y-2 text-sm">
-            <div className="flex justify-between"><dt className="text-muted-foreground">Revenue Goal</dt><dd className="font-semibold">{currency(goals.totalRevenueGoal)}</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">Total Expenses</dt><dd className="font-semibold">{currency(goals.totalExpenses)}</dd></div>
-            <div className="flex justify-between border-t border-border pt-2"><dt className="font-medium text-foreground">Projected Surplus</dt><dd className="font-bold text-success">{currency(surplus)}</dd></div>
+
+        <Card className="p-5 lg:col-span-2">
+          <h2 className="font-display text-lg font-semibold text-foreground">Revenue Snapshot</h2>
+          <p className="mb-4 text-sm text-muted-foreground">Secured revenue by source.</p>
+          <dl className="space-y-3 text-sm">
+            <div className="flex items-center justify-between">
+              <dt className="text-muted-foreground">Grants Awarded</dt>
+              <dd className="font-semibold text-foreground">{currency(grantsAwarded)}</dd>
+            </div>
+            <div className="flex items-center justify-between">
+              <dt className="text-muted-foreground">Sponsors Committed</dt>
+              <dd className="font-semibold text-foreground">{currency(sponsorsCommitted)}</dd>
+            </div>
+            <div className="flex items-center justify-between">
+              <dt className="text-muted-foreground">Golf Event</dt>
+              <dd className="font-semibold text-foreground">{currency(golfRevenue)}</dd>
+            </div>
+            <div className="flex items-center justify-between">
+              <dt className="text-muted-foreground">Donor Gifts</dt>
+              <dd className="font-semibold text-foreground">{currency(donorsWon)}</dd>
+            </div>
+            <div className="flex items-center justify-between border-t border-border pt-3">
+              <dt className="font-medium text-foreground">Total Raised</dt>
+              <dd className="font-bold text-success">{currency(totalRaised)}</dd>
+            </div>
           </dl>
-        </Card>
-        <Card className="p-5">
-          <h3 className="font-display text-base font-semibold text-foreground">Grant Pipeline</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Total requested across {data.grants.length} grants</p>
-          <p className="mt-3 font-display text-3xl font-bold text-primary">
-            {compactCurrency(data.grants.reduce((s, g) => s + g.amountRequested, 0))}
-          </p>
-          <p className="mt-1 text-sm text-success">
-            {compactCurrency(data.grants.filter((g) => g.status === "Awarded").reduce((s, g) => s + g.awardAmount, 0))} awarded
-          </p>
+          {totalPipeline > 0 && (
+            <div className="mt-4 flex items-start gap-2 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+              <span>{compactCurrency(totalPipeline)} in open pipeline could be converted this fiscal year.</span>
+            </div>
+          )}
         </Card>
       </div>
     </div>
