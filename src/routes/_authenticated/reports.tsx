@@ -20,7 +20,7 @@ import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { ProgressRow } from "@/components/dashboard/ProgressRow";
-import { useStore } from "@/lib/store";
+import { useDashboard } from "@/lib/db";
 import { currency, compactCurrency, formatDate, isThisMonth, pct } from "@/lib/format";
 import { PROGRAMS } from "@/lib/types";
 
@@ -68,7 +68,7 @@ function GrantTable({ rows }: { rows: { funderName: string; programFit: string; 
 }
 
 function ReportsPage() {
-  const { data } = useStore();
+  const { data } = useDashboard();
   const [report, setReport] = useState<string>(REPORTS[0]);
   const { grants, donors, goals } = data;
 
