@@ -103,7 +103,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="border-t border-sidebar-border">
         <p className="px-2 py-1 text-xs text-sidebar-foreground/50 group-data-[collapsible=icon]:hidden">
-          Connecting sports, academics & leadership.
+          {tagline}
         </p>
       </SidebarFooter>
     </Sidebar>
