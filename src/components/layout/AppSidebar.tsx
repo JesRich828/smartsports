@@ -45,11 +45,12 @@ export function AppSidebar() {
   const [tagline, setTagline] = useState("");
 
   useEffect(() => {
-    supabase
-      .from("organization_settings")
-      .select("logo_initials, org_name, tagline")
-      .single()
-      .then(({ data, error }) => {
+    const fetchSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("organization_settings")
+          .select("logo_initials, org_name, tagline")
+          .single();
         if (data && !error) {
           setLogo(data.logo_initials || "SS");
           setOrgName(data.org_name || "SMART Sports");
@@ -59,12 +60,13 @@ export function AppSidebar() {
           setOrgName("SMART Sports");
           setTagline("Connecting sports, academics & leadership.");
         }
-      })
-      .catch(() => {
+      } catch {
         setLogo("SS");
         setOrgName("SMART Sports");
         setTagline("Connecting sports, academics & leadership.");
-      });
+      }
+    };
+    fetchSettings();
   }, []);
 
   return (
