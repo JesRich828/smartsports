@@ -31,8 +31,8 @@ import { SPONSOR_LEVELS } from "@/lib/types";
 export const Route = createFileRoute("/_authenticated/golf")({
   head: () => ({
     meta: [
-      { title: "SMART Sports Invitational — Golf Tracker" },
-      { name: "description", content: "Track sponsors, players, auction items, and revenue for the SMART Sports Invitational." },
+      { title: "Events" },
+      { name: "description", content: "Track event sponsors, attendees, and revenue." },
     ],
   }),
   component: GolfPage,
@@ -57,8 +57,8 @@ function GolfPage() {
   return (
     <div>
       <PageHeader
-        title="SMART Sports Invitational"
-        description="Golf fundraiser sponsorship, player, and revenue tracker."
+        title="Events"
+        description="Track event sponsors, attendees, and revenue."
       />
 
       <Card className="brand-gradient mb-6 flex flex-wrap items-center gap-x-8 gap-y-3 p-5 text-primary-foreground">
