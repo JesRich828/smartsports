@@ -25,12 +25,36 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [orgName, setOrgName] = useState("SMART Sports");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) navigate({ to: "/" });
     });
   }, [navigate]);
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("org_name")
+      .single()
+      .then(({ data: settings, error }) => {
+        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("SMART Sports")) {
+      document.title = document.title.replace(/SMART Sports/g, orgName);
+    }
+    document.querySelectorAll("meta").forEach((m) => {
+      const c = m.getAttribute("content");
+      if (c && c.includes("SMART Sports")) {
+        m.setAttribute("content", c.replace(/SMART Sports/g, orgName));
+      }
+    });
+  }, [orgName]);
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
@@ -93,7 +117,7 @@ function AuthPage() {
             SS
           </div>
           <div className="grid leading-tight">
-            <span className="font-display text-lg font-bold text-foreground">SMART Sports</span>
+            <span className="font-display text-lg font-bold text-foreground">{orgName}</span>
             <span className="text-xs text-muted-foreground">FY26 Fundraising Command Center</span>
           </div>
         </Link>
