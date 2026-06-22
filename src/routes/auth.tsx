@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,17 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+const getAuthOrgName = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("organization_settings")
+    .select("org_name")
+    .single();
+
+  if (error || !data?.org_name) return "SMART Sports";
+  return data.org_name;
+});
+
 function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -34,13 +46,22 @@ function AuthPage() {
   }, [navigate]);
 
   useEffect(() => {
-    supabase
-      .from("organization_settings")
-      .select("org_name")
-      .single()
-      .then(({ data: settings, error }) => {
-        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
-      });
+    let isMounted = true;
+
+    const fetchOrgName = async () => {
+      try {
+        const name = await getAuthOrgName();
+        if (isMounted) setOrgName(name || "SMART Sports");
+      } catch {
+        if (isMounted) setOrgName("SMART Sports");
+      }
+    };
+
+    fetchOrgName();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
