@@ -140,7 +140,7 @@ function Index() {
     <div>
       <PageHeader
         title="Executive Dashboard"
-        description="FY26 fundraising performance for SMART Sports — connecting sports, academics, STEM, leadership, wellness, mentorship, and career exposure."
+        description={`FY26 fundraising performance for ${orgName} — connecting sports, academics, STEM, leadership, wellness, mentorship, and career exposure.`}
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
