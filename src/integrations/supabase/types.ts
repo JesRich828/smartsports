@@ -356,6 +356,36 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_settings: {
+        Row: {
+          accent_color: string
+          created_at: string
+          id: string
+          logo_initials: string
+          org_name: string
+          primary_color: string
+          tagline: string
+        }
+        Insert: {
+          accent_color?: string
+          created_at?: string
+          id?: string
+          logo_initials?: string
+          org_name?: string
+          primary_color?: string
+          tagline?: string
+        }
+        Update: {
+          accent_color?: string
+          created_at?: string
+          id?: string
+          logo_initials?: string
+          org_name?: string
+          primary_color?: string
+          tagline?: string
+        }
+        Relationships: []
+      }
       sponsors: {
         Row: {
           commitment: number | null
