@@ -48,6 +48,28 @@ const COMMITTED_SPONSOR = new Set(["Committed", "Declined"]);
 
 function Index() {
   const { data } = useDashboard();
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data: settings, error } = await supabase
+          .from("organization_settings")
+          .select("org_name")
+          .single();
+        if (settings && !error) {
+          setOrgName(settings.org_name || "SMART Sports");
+        }
+      } catch {
+        // keep fallback
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    document.title = `Executive Dashboard — ${orgName} FY26`;
+  }, [orgName]);
 
   // Golf event revenue: sponsors + foursomes + players + auction
   const golfSponsorRev = data.golfSponsors.reduce((s, g) => s + (g.amount || 0), 0);
