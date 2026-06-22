@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Select,
@@ -21,6 +21,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { ProgressRow } from "@/components/dashboard/ProgressRow";
 import { useDashboard } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 import { currency, compactCurrency, formatDate, isThisMonth, pct } from "@/lib/format";
 import { PROGRAMS } from "@/lib/types";
 
@@ -71,6 +72,30 @@ function ReportsPage() {
   const { data } = useDashboard();
   const [report, setReport] = useState<string>(REPORTS[0]);
   const { grants, donors, goals } = data;
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("org_name")
+      .single()
+      .then(({ data: settings, error }) => {
+        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("SMART Sports")) {
+      document.title = document.title.replace(/SMART Sports/g, orgName);
+    }
+    document.querySelectorAll("meta").forEach((m) => {
+      const c = m.getAttribute("content");
+      if (c && c.includes("SMART Sports")) {
+        m.setAttribute("content", c.replace(/SMART Sports/g, orgName));
+      }
+    });
+  }, [orgName]);
 
   const golfRevenue = useMemo(() => {
     const sponsor = data.golfSponsors.filter((s) => s.confirmed).reduce((s, x) => s + x.amount, 0);
