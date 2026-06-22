@@ -43,18 +43,20 @@ export function AppSidebar() {
   const [logo, setLogo] = useState("");
   const [orgName, setOrgName] = useState("");
   const [tagline, setTagline] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const { data, error } = await supabase
           .from("organization_settings")
-          .select("logo_initials, org_name, tagline")
+          .select("logo_initials, org_name, tagline, logo_url")
           .single();
         if (data && !error) {
           setLogo(data.logo_initials || "SS");
           setOrgName(data.org_name || "SMART Sports");
           setTagline(data.tagline || "Connecting sports, academics & leadership.");
+          setLogoUrl(data.logo_url || "");
         } else {
           setLogo("SS");
           setOrgName("SMART Sports");
@@ -73,9 +75,17 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 px-2 py-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-display text-base font-extrabold text-sidebar-primary-foreground">
-            {logo}
-          </div>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt={orgName}
+              className="h-9 w-9 shrink-0 rounded-lg object-contain"
+            />
+          ) : (
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-display text-base font-extrabold text-sidebar-primary-foreground">
+              {logo}
+            </div>
+          )}
           <div className="grid leading-tight group-data-[collapsible=icon]:hidden">
             <span className="font-display text-sm font-bold text-sidebar-foreground">{orgName}</span>
             <span className="text-xs text-sidebar-foreground/60">FY26 Fundraising</span>
