@@ -29,7 +29,7 @@ const items = [
   { title: "Executive Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Grant Tracking", url: "/grants", icon: FileText },
   { title: "Donor & Prospect CRM", url: "/donors", icon: Users },
-  { title: "Golf Invitational", url: "/golf", icon: Flag },
+  { title: "Events", url: "/golf", icon: Flag },
   { title: "Programs", url: "/programs", icon: BookOpen },
   { title: "Board Dashboard", url: "/board", icon: Briefcase },
   { title: "Reports", url: "/reports", icon: BarChart3 },
