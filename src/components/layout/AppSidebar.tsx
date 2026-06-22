@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -10,6 +11,7 @@ import {
   Sparkles,
   BellRing,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar,
   SidebarContent,
