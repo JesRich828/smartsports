@@ -40,6 +40,32 @@ const items = [
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (url: string) => (url === "/" ? currentPath === "/" : currentPath.startsWith(url));
+  const [logo, setLogo] = useState("");
+  const [orgName, setOrgName] = useState("");
+  const [tagline, setTagline] = useState("");
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("logo_initials, org_name, tagline")
+      .single()
+      .then(({ data, error }) => {
+        if (data && !error) {
+          setLogo(data.logo_initials || "SS");
+          setOrgName(data.org_name || "SMART Sports");
+          setTagline(data.tagline || "Connecting sports, academics & leadership.");
+        } else {
+          setLogo("SS");
+          setOrgName("SMART Sports");
+          setTagline("Connecting sports, academics & leadership.");
+        }
+      })
+      .catch(() => {
+        setLogo("SS");
+        setOrgName("SMART Sports");
+        setTagline("Connecting sports, academics & leadership.");
+      });
+  }, []);
 
   return (
     <Sidebar collapsible="icon">
