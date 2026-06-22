@@ -74,10 +74,10 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 px-2 py-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-display text-base font-extrabold text-sidebar-primary-foreground">
-            SS
+            {logo}
           </div>
           <div className="grid leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="font-display text-sm font-bold text-sidebar-foreground">SMART Sports</span>
+            <span className="font-display text-sm font-bold text-sidebar-foreground">{orgName}</span>
             <span className="text-xs text-sidebar-foreground/60">FY26 Fundraising</span>
           </div>
         </Link>
