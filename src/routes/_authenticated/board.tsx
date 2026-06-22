@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Users, Handshake, CalendarCheck, Target, Megaphone, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { ProgressRow } from "@/components/dashboard/ProgressRow";
 import { toast } from "sonner";
 import { useDashboard } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 import { currency, compactCurrency } from "@/lib/format";
 import type { BoardMember } from "@/lib/types";
 
@@ -31,6 +33,30 @@ export const Route = createFileRoute("/_authenticated/board")({
 function BoardPage() {
   const { data, saveRow } = useDashboard();
   const board = data.board;
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("org_name")
+      .single()
+      .then(({ data: settings, error }) => {
+        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("SMART Sports")) {
+      document.title = document.title.replace(/SMART Sports/g, orgName);
+    }
+    document.querySelectorAll("meta").forEach((m) => {
+      const c = m.getAttribute("content");
+      if (c && c.includes("SMART Sports")) {
+        m.setAttribute("content", c.replace(/SMART Sports/g, orgName));
+      }
+    });
+  }, [orgName]);
 
   const totalGiven = board.reduce((s, b) => s + b.given, 0);
   const totalGoal = data.goals.boardGivingGoal;
@@ -50,7 +76,7 @@ function BoardPage() {
 
   return (
     <div>
-      <PageHeader title="Board Dashboard" description="Engagement and giving accountability across the SMART Sports board." />
+      <PageHeader title="Board Dashboard" description={`Engagement and giving accountability across the ${orgName} board.`} />
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Board Giving" value={compactCurrency(totalGiven)} sub={`Goal ${compactCurrency(totalGoal)}`} accent="green" icon={<Target className="h-5 w-5" />} />

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -33,6 +33,7 @@ import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { useDashboard, newId } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 import { currency, formatDate, compactCurrency } from "@/lib/format";
 import { DONOR_TYPES, DONOR_STAGES, type Donor } from "@/lib/types";
 
@@ -69,6 +70,30 @@ function DonorsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [editing, setEditing] = useState<Donor | null>(null);
   const [open, setOpen] = useState(false);
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("org_name")
+      .single()
+      .then(({ data: settings, error }) => {
+        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("SMART Sports")) {
+      document.title = document.title.replace(/SMART Sports/g, orgName);
+    }
+    document.querySelectorAll("meta").forEach((m) => {
+      const c = m.getAttribute("content");
+      if (c && c.includes("SMART Sports")) {
+        m.setAttribute("content", c.replace(/SMART Sports/g, orgName));
+      }
+    });
+  }, [orgName]);
 
   const filtered = useMemo(() => {
     return data.donors.filter((d) => {
@@ -208,7 +233,7 @@ function DonorsPage() {
                 </Select>
               </div>
               <div className="space-y-1.5"><Label className="text-xs">Last Contact</Label><Input type="date" value={editing.lastContact} onChange={(e) => set({ lastContact: e.target.value })} /></div>
-              <div className="space-y-1.5 sm:col-span-2"><Label className="text-xs">Connection to SMART Sports</Label><Input value={editing.connection} onChange={(e) => set({ connection: e.target.value })} /></div>
+              <div className="space-y-1.5 sm:col-span-2"><Label className="text-xs">Connection to {orgName}</Label><Input value={editing.connection} onChange={(e) => set({ connection: e.target.value })} /></div>
               <div className="space-y-1.5 sm:col-span-2"><Label className="text-xs">Next Step</Label><Input value={editing.nextStep} onChange={(e) => set({ nextStep: e.target.value })} /></div>
               <div className="space-y-1.5 sm:col-span-2"><Label className="text-xs">Notes</Label><Textarea value={editing.notes} onChange={(e) => set({ notes: e.target.value })} /></div>
             </div>
