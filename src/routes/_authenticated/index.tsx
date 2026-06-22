@@ -67,9 +67,6 @@ function Index() {
     fetchSettings();
   }, []);
 
-  useEffect(() => {
-    document.title = `Executive Dashboard — ${orgName} FY26`;
-  }, [orgName]);
 
   // Golf event revenue: sponsors + foursomes + players + auction
   const golfSponsorRev = data.golfSponsors.reduce((s, g) => s + (g.amount || 0), 0);
