@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import {
   Sparkles,
@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/select";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { useDashboard } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 import { currency, formatDate } from "@/lib/format";
 import { generateDocument, type AssistantType } from "@/lib/api/assistants.functions";
 import type { AppData } from "@/lib/types";
@@ -157,6 +158,30 @@ function AssistantsPage() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("org_name")
+      .single()
+      .then(({ data: settings, error }) => {
+        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("SMART Sports")) {
+      document.title = document.title.replace(/SMART Sports/g, orgName);
+    }
+    document.querySelectorAll("meta").forEach((m) => {
+      const c = m.getAttribute("content");
+      if (c && c.includes("SMART Sports")) {
+        m.setAttribute("content", c.replace(/SMART Sports/g, orgName));
+      }
+    });
+  }, [orgName]);
 
   const run = useServerFn(generateDocument);
   const active = ASSISTANTS.find((a) => a.type === activeType)!;

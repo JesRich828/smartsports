@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -137,6 +137,31 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("org_name")
+      .single()
+      .then(({ data: settings, error }) => {
+        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("SMART Sports")) {
+      document.title = document.title.replace(/SMART Sports/g, orgName);
+    }
+    document.querySelectorAll("meta").forEach((m) => {
+      const c = m.getAttribute("content");
+      if (c && c.includes("SMART Sports")) {
+        m.setAttribute("content", c.replace(/SMART Sports/g, orgName));
+      }
+    });
+  }, [orgName]);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {

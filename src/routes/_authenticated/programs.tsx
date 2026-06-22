@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { BookOpen, FlaskConical, GraduationCap, Building2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { StatusBadge } from "@/components/dashboard/StatusBadge";
 import { useDashboard } from "@/lib/db";
+import { supabase } from "@/integrations/supabase/client";
 import { currency, compactCurrency } from "@/lib/format";
 import { PROGRAMS } from "@/lib/types";
 
@@ -26,6 +28,30 @@ const icons: Record<string, typeof BookOpen> = {
 
 function ProgramsPage() {
   const { data } = useDashboard();
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("org_name")
+      .single()
+      .then(({ data: settings, error }) => {
+        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("SMART Sports")) {
+      document.title = document.title.replace(/SMART Sports/g, orgName);
+    }
+    document.querySelectorAll("meta").forEach((m) => {
+      const c = m.getAttribute("content");
+      if (c && c.includes("SMART Sports")) {
+        m.setAttribute("content", c.replace(/SMART Sports/g, orgName));
+      }
+    });
+  }, [orgName]);
 
   const summaries = PROGRAMS.map((program) => {
     const grants = data.grants.filter((g) => g.programFit === program);
@@ -38,7 +64,7 @@ function ProgramsPage() {
     <div>
       <PageHeader
         title="Programs Dashboard"
-        description="Fundraising and grant activity broken down by SMART Sports program area."
+        description={`Fundraising and grant activity broken down by ${orgName} program area.`}
       />
       <div className="grid gap-4 lg:grid-cols-2">
         {summaries.map(({ program, grants, requested, awarded }) => {

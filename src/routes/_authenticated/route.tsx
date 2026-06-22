@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppSidebar } from "@/components/layout/AppSidebar";
@@ -18,6 +19,18 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthenticatedLayout() {
   const navigate = useNavigate();
 
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    supabase
+      .from("organization_settings")
+      .select("org_name")
+      .single()
+      .then(({ data: settings, error }) => {
+        if (settings && !error && settings.org_name) setOrgName(settings.org_name);
+      });
+  }, []);
+
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/auth" });
@@ -31,7 +44,7 @@ function AuthenticatedLayout() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <span className="font-display text-sm font-semibold text-foreground">
-              SMART Sports — Fundraising Command Center
+              {orgName} — Fundraising Command Center
             </span>
             <Button variant="ghost" size="sm" className="ml-auto gap-2" onClick={signOut}>
               <LogOut className="h-4 w-4" />
