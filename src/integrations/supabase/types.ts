@@ -362,6 +362,7 @@ export type Database = {
           created_at: string
           id: string
           logo_initials: string
+          logo_url: string | null
           org_name: string
           primary_color: string
           tagline: string
@@ -371,6 +372,7 @@ export type Database = {
           created_at?: string
           id?: string
           logo_initials?: string
+          logo_url?: string | null
           org_name?: string
           primary_color?: string
           tagline?: string
@@ -380,6 +382,7 @@ export type Database = {
           created_at?: string
           id?: string
           logo_initials?: string
+          logo_url?: string | null
           org_name?: string
           primary_color?: string
           tagline?: string
