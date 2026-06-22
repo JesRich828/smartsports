@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   TrendingUp,
   FileText,
@@ -46,6 +48,28 @@ const COMMITTED_SPONSOR = new Set(["Committed", "Declined"]);
 
 function Index() {
   const { data } = useDashboard();
+  const [orgName, setOrgName] = useState("SMART Sports");
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data: settings, error } = await supabase
+          .from("organization_settings")
+          .select("org_name")
+          .single();
+        if (settings && !error) {
+          setOrgName(settings.org_name || "SMART Sports");
+        }
+      } catch {
+        // keep fallback
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    document.title = `Executive Dashboard — ${orgName} FY26`;
+  }, [orgName]);
 
   // Golf event revenue: sponsors + foursomes + players + auction
   const golfSponsorRev = data.golfSponsors.reduce((s, g) => s + (g.amount || 0), 0);
@@ -116,7 +140,7 @@ function Index() {
     <div>
       <PageHeader
         title="Executive Dashboard"
-        description="FY26 fundraising performance for SMART Sports — connecting sports, academics, STEM, leadership, wellness, mentorship, and career exposure."
+        description={`FY26 fundraising performance for ${orgName} — connecting sports, academics, STEM, leadership, wellness, mentorship, and career exposure.`}
       />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
