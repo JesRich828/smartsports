@@ -76,11 +76,13 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 px-2 py-3">
           {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt={orgName}
-              className="h-11 w-11 shrink-0 rounded-lg object-contain bg-white p-0.5"
-            />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white p-1">
+              <img
+                src={logoUrl}
+                alt={orgName}
+                className="h-full w-full object-contain"
+              />
+            </div>
           ) : (
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-display text-base font-extrabold text-sidebar-primary-foreground">
               {logo}
