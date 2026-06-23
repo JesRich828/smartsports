@@ -83,8 +83,8 @@ export function AppSidebar() {
                   className="h-9 w-9 shrink-0 rounded-lg bg-sidebar-foreground/95 bg-no-repeat shadow-sm"
                   style={{
                     backgroundImage: `url(${logoUrl})`,
-                    backgroundPosition: "center 28%",
-                    backgroundSize: "76px 76px",
+                    backgroundPosition: "center 24%",
+                    backgroundSize: "110px 110px",
                   }}
                   aria-hidden="true"
                 />
