@@ -79,14 +79,15 @@ export function AppSidebar() {
           {logoUrl ? (
             showLogoTextFallback ? (
               <>
-                <div className="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-sidebar-foreground/95 shadow-sm">
-                  <img
-                    src={logoUrl}
-                    alt=""
-                    aria-hidden="true"
-                    className="absolute left-0 top-1/2 h-[72px] w-[72px] max-w-none -translate-y-1/2 object-contain"
-                  />
-                </div>
+                <div
+                  className="h-9 w-9 shrink-0 rounded-lg bg-sidebar-foreground/95 bg-no-repeat shadow-sm"
+                  style={{
+                    backgroundImage: `url(${logoUrl})`,
+                    backgroundPosition: "center 28%",
+                    backgroundSize: "76px 76px",
+                  }}
+                  aria-hidden="true"
+                />
                 <div className="grid leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="font-display text-sm font-bold text-sidebar-foreground">{orgName}</span>
                   <span className="text-xs text-sidebar-foreground/60">FY26 Fundraising</span>
