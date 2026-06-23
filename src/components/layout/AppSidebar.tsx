@@ -76,22 +76,22 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 px-2 py-3">
           {logoUrl ? (
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white p-1">
-              <img
-                src={logoUrl}
-                alt={orgName}
-                className="h-full w-full object-contain"
-              />
-            </div>
+            <img
+              src={logoUrl}
+              alt={orgName}
+              className="h-14 w-auto max-w-full shrink-0 object-contain"
+            />
           ) : (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-display text-base font-extrabold text-sidebar-primary-foreground">
-              {logo}
-            </div>
+            <>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-display text-base font-extrabold text-sidebar-primary-foreground">
+                {logo}
+              </div>
+              <div className="grid leading-tight group-data-[collapsible=icon]:hidden">
+                <span className="font-display text-sm font-bold text-sidebar-foreground">{orgName}</span>
+                <span className="text-xs text-sidebar-foreground/60">FY26 Fundraising</span>
+              </div>
+            </>
           )}
-          <div className="grid leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="font-display text-sm font-bold text-sidebar-foreground">{orgName}</span>
-            <span className="text-xs text-sidebar-foreground/60">FY26 Fundraising</span>
-          </div>
         </Link>
       </SidebarHeader>
       <SidebarContent>
