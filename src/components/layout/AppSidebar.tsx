@@ -79,7 +79,7 @@ export function AppSidebar() {
             <img
               src={logoUrl}
               alt={orgName}
-              className="h-9 w-9 shrink-0 rounded-lg object-contain"
+              className="h-11 w-11 shrink-0 rounded-lg object-contain bg-white p-0.5"
             />
           ) : (
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-display text-base font-extrabold text-sidebar-primary-foreground">
