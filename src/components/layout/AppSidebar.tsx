@@ -44,6 +44,7 @@ export function AppSidebar() {
   const [orgName, setOrgName] = useState("");
   const [tagline, setTagline] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
+  const [showLogoTextFallback, setShowLogoTextFallback] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -76,11 +77,42 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 px-2 py-3">
           {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt={orgName}
-              className="h-14 w-auto max-w-full shrink-0 object-contain"
-            />
+            showLogoTextFallback ? (
+              <>
+                <div className="relative flex h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-sidebar-foreground/95 shadow-sm">
+                  <img
+                    src={logoUrl}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute left-0 top-1/2 h-[72px] w-[72px] max-w-none -translate-y-1/2 object-contain"
+                  />
+                </div>
+                <div className="grid leading-tight group-data-[collapsible=icon]:hidden">
+                  <span className="font-display text-sm font-bold text-sidebar-foreground">{orgName}</span>
+                  <span className="text-xs text-sidebar-foreground/60">FY26 Fundraising</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <img
+                  src={logoUrl}
+                  alt={orgName}
+                  className="block h-auto w-full max-w-[180px] shrink-0 rounded-sm bg-sidebar-foreground/95 p-1.5 object-contain shadow-sm group-data-[collapsible=icon]:hidden"
+                  onLoad={(event) => {
+                    const image = event.currentTarget;
+                    if (image.naturalWidth > 0 && image.naturalHeight > 0 && image.naturalWidth / image.naturalHeight < 1.8) {
+                      setShowLogoTextFallback(true);
+                    }
+                  }}
+                  onError={() => setShowLogoTextFallback(true)}
+                />
+                <img
+                  src={logoUrl}
+                  alt={orgName}
+                  className="hidden h-8 w-8 shrink-0 rounded-md bg-sidebar-foreground/95 p-1 object-contain shadow-sm group-data-[collapsible=icon]:block"
+                />
+              </>
+            )
           ) : (
             <>
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary font-display text-base font-extrabold text-sidebar-primary-foreground">
