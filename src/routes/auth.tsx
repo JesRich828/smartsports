@@ -31,8 +31,6 @@ const getAuthOrgName = createServerFn({ method: "GET" }).handler(async () => {
   return data.org_name;
 });
 
-const ORG_EMAIL_DOMAIN = "smartsports.org";
-
 function AuthPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
