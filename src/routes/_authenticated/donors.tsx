@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Plus, Pencil, Trash2, Search, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,95 @@ function emptyDonor(): Donor {
   };
 }
 
+const CSV_FIELDS = [
+  "name",
+  "organization",
+  "type",
+  "givingCapacity",
+  "interestArea",
+  "connection",
+  "lastContact",
+  "nextStep",
+  "askAmount",
+  "stage",
+  "notes",
+] as const;
+
+// Minimal RFC-4180-ish CSV parser (handles quoted fields, escaped quotes, CRLF).
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = "";
+  let inQuotes = false;
+  const s = text.replace(/^\uFEFF/, "");
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (s[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ",") {
+      row.push(field); field = "";
+    } else if (c === "\n" || c === "\r") {
+      if (c === "\r" && s[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      rows.push(row); row = [];
+    } else {
+      field += c;
+    }
+  }
+  if (field !== "" || row.length > 0) { row.push(field); rows.push(row); }
+  return rows.filter((r) => r.some((c) => c.trim() !== ""));
+}
+
+type ParsedImport = {
+  valid: Donor[];
+  skipped: number;
+};
+
+function buildImport(text: string): ParsedImport {
+  const rows = parseCsv(text);
+  if (rows.length === 0) return { valid: [], skipped: 0 };
+  const header = rows[0].map((h) => h.trim());
+  const lower = header.map((h) => h.toLowerCase());
+  const idx = (field: string) => lower.indexOf(field.toLowerCase());
+  const get = (cells: string[], field: string) => {
+    const i = idx(field);
+    return i >= 0 && cells[i] != null ? cells[i].trim() : "";
+  };
+  const valid: Donor[] = [];
+  let skipped = 0;
+  for (let r = 1; r < rows.length; r++) {
+    const cells = rows[r];
+    const name = get(cells, "name");
+    if (!name) { skipped++; continue; }
+    const rawType = get(cells, "type");
+    const type = (DONOR_TYPES as readonly string[]).includes(rawType) ? rawType : (rawType || DONOR_TYPES[0]);
+    const rawStage = get(cells, "stage");
+    const stage = (DONOR_STAGES as readonly string[]).includes(rawStage) ? rawStage : (rawStage || DONOR_STAGES[0]);
+    const askRaw = get(cells, "askAmount").replace(/[$,]/g, "");
+    const ask = Number(askRaw);
+    valid.push({
+      id: newId(),
+      name,
+      organization: get(cells, "organization"),
+      type,
+      givingCapacity: get(cells, "givingCapacity"),
+      interestArea: get(cells, "interestArea"),
+      connection: get(cells, "connection"),
+      lastContact: get(cells, "lastContact"),
+      nextStep: get(cells, "nextStep"),
+      askAmount: Number.isFinite(ask) && askRaw !== "" ? ask : 0,
+      stage,
+      notes: get(cells, "notes"),
+    });
+  }
+  return { valid, skipped };
+}
+
 function DonorsPage() {
   const { data, addRow, saveRow, removeRow } = useDashboard();
   const [query, setQuery] = useState("");
@@ -71,6 +160,9 @@ function DonorsPage() {
   const [editing, setEditing] = useState<Donor | null>(null);
   const [open, setOpen] = useState(false);
   const [orgName, setOrgName] = useState("SMART Sports");
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<ParsedImport | null>(null);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     supabase
@@ -137,12 +229,55 @@ function DonorsPage() {
 
   const set = (patch: Partial<Donor>) => editing && setEditing({ ...editing, ...patch });
 
+  function onFilePicked(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (fileRef.current) fileRef.current.value = "";
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const result = buildImport(String(reader.result ?? ""));
+        if (result.valid.length === 0 && result.skipped === 0) {
+          toast.error("No rows found in the CSV file");
+          return;
+        }
+        setPreview(result);
+      } catch {
+        toast.error("Could not parse the CSV file");
+      }
+    };
+    reader.onerror = () => toast.error("Could not read the file");
+    reader.readAsText(file);
+  }
+
+  async function confirmImport() {
+    if (!preview) return;
+    setImporting(true);
+    try {
+      for (const row of preview.valid) {
+        await addRow("donors", row);
+      }
+      toast.success(`Imported ${preview.valid.length} contact${preview.valid.length === 1 ? "" : "s"}`);
+      setPreview(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not import contacts");
+    } finally {
+      setImporting(false);
+    }
+  }
+
   return (
     <div>
       <PageHeader
         title="Donor & Prospect CRM"
         description="Individuals, major gift prospects, corporate sponsors, board contacts, sports leaders, alumni, foundations, and community partners."
-        action={<Button onClick={openNew}><Plus className="h-4 w-4" /> Add Contact</Button>}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={onFilePicked} />
+            <Button variant="outline" onClick={() => fileRef.current?.click()}><Upload className="h-4 w-4" /> Import CSV</Button>
+            <Button onClick={openNew}><Plus className="h-4 w-4" /> Add Contact</Button>
+          </div>
+        }
       />
 
       <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -239,6 +374,29 @@ function DonorsPage() {
             </div>
           )}
           <DialogFooter><Button onClick={save}>Save Contact</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!preview} onOpenChange={(o) => { if (!o && !importing) setPreview(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Import preview</DialogTitle></DialogHeader>
+          {preview && (
+            <div className="space-y-3 text-sm">
+              <p><span className="font-medium text-foreground">{preview.valid.length}</span> contact{preview.valid.length === 1 ? "" : "s"} ready to import.</p>
+              {preview.skipped > 0 && (
+                <p className="text-muted-foreground"><span className="font-medium text-destructive">{preview.skipped}</span> row{preview.skipped === 1 ? "" : "s"} skipped (missing name).</p>
+              )}
+              {preview.valid.length === 0 && (
+                <p className="text-muted-foreground">No valid rows to import.</p>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPreview(null)} disabled={importing}>Cancel</Button>
+            <Button onClick={confirmImport} disabled={importing || !preview || preview.valid.length === 0}>
+              {importing ? "Importing…" : "Confirm Import"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
