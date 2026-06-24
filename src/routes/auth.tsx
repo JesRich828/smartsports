@@ -87,10 +87,6 @@ function AuthPage() {
     try {
       if (mode === "signup") {
         const normalizedEmail = email.trim().toLowerCase();
-        if (!normalizedEmail.endsWith(`@${ORG_EMAIL_DOMAIN}`)) {
-          toast.error(`Registration is restricted to @${ORG_EMAIL_DOMAIN} email addresses.`);
-          return;
-        }
         const { error } = await supabase.auth.signUp({
           email: normalizedEmail,
           password,
@@ -117,9 +113,6 @@ function AuthPage() {
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
-        extraParams: {
-          hd: "smartsports.org",
-        },
       });
       if (result.error) {
         toast.error("Google sign-in failed. Please try again.");
@@ -153,7 +146,7 @@ function AuthPage() {
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "signup"
-              ? `Register with your @${ORG_EMAIL_DOMAIN} email to access the fundraising dashboard.`
+              ? "Register to access the fundraising dashboard."
               : "Sign in to access the fundraising dashboard."}
           </p>
 
@@ -166,7 +159,7 @@ function AuthPage() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@smartsports.org"
+                placeholder="Enter your email"
               />
             </div>
             <div className="space-y-1.5">
@@ -208,10 +201,6 @@ function AuthPage() {
           <Button variant="outline" className="w-full" onClick={handleGoogle} disabled={loading}>
             Continue with Google
           </Button>
-
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            Registration is restricted to @{ORG_EMAIL_DOMAIN} email addresses.
-          </p>
         </Card>
       </div>
     </div>
