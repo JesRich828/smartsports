@@ -20,15 +20,21 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const getAuthOrgName = createServerFn({ method: "GET" }).handler(async () => {
+const getAuthOrgSettings = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("organization_settings")
-    .select("org_name")
+    .select("org_name, logo_url, logo_initials")
     .single();
 
-  if (error || !data?.org_name) return "SMART Sports";
-  return data.org_name;
+  if (error || !data) {
+    return { orgName: "SMART Sports", logoUrl: "", logoInitials: "SS" };
+  }
+  return {
+    orgName: data.org_name || "SMART Sports",
+    logoUrl: data.logo_url || "",
+    logoInitials: data.logo_initials || "SS",
+  };
 });
 
 function AuthPage() {
@@ -38,6 +44,8 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [orgName, setOrgName] = useState("SMART Sports");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [logoInitials, setLogoInitials] = useState("SS");
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -48,16 +56,24 @@ function AuthPage() {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchOrgName = async () => {
+    const fetchSettings = async () => {
       try {
-        const name = await getAuthOrgName();
-        if (isMounted) setOrgName(name || "SMART Sports");
+        const settings = await getAuthOrgSettings();
+        if (isMounted) {
+          setOrgName(settings.orgName || "SMART Sports");
+          setLogoUrl(settings.logoUrl || "");
+          setLogoInitials(settings.logoInitials || "SS");
+        }
       } catch {
-        if (isMounted) setOrgName("SMART Sports");
+        if (isMounted) {
+          setOrgName("SMART Sports");
+          setLogoUrl("");
+          setLogoInitials("SS");
+        }
       }
     };
 
-    fetchOrgName();
+    fetchSettings();
 
     return () => {
       isMounted = false;
@@ -131,9 +147,6 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center bg-secondary px-4 py-12">
       <div className="w-full max-w-md">
         <Link to="/auth" className="mb-6 flex items-center justify-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary font-display text-lg font-extrabold text-primary-foreground">
-            SS
-          </div>
           <div className="grid leading-tight">
             <span className="font-display text-lg font-bold text-foreground">{orgName}</span>
             <span className="text-xs text-muted-foreground">FY26 Fundraising Command Center</span>
@@ -141,6 +154,19 @@ function AuthPage() {
         </Link>
 
         <Card className="p-6">
+          <div className="mb-4 flex justify-center">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={orgName}
+                className="h-24 w-auto max-w-full object-contain"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-primary font-display text-3xl font-extrabold text-primary-foreground">
+                {logoInitials}
+              </div>
+            )}
+          </div>
           <h1 className="font-display text-xl font-bold text-foreground">
             {mode === "signup" ? "Create your account" : "Welcome back"}
           </h1>
