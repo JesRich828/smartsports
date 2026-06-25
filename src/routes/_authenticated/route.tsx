@@ -44,7 +44,7 @@ function AuthenticatedLayout() {
           <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-border bg-card/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <span className="font-display text-sm font-semibold text-foreground">
-              {orgName} — Fundraising Command Center
+              {orgName} Fundraising Command Center
             </span>
             <Button variant="ghost" size="sm" className="ml-auto gap-2" onClick={signOut}>
               <LogOut className="h-4 w-4" />
