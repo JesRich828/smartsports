@@ -212,10 +212,10 @@ function GrantsPage() {
                   <TableCell className="text-sm">{formatDate(g.deadline)}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{g.assignedOwner || "—"}</TableCell>
                   <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(g)}>
+                    <Button variant="ghost" size="icon" aria-label="Edit grant" onClick={() => openEdit(g)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => remove(g.id)}>
+                    <Button variant="ghost" size="icon" aria-label="Delete grant" onClick={() => remove(g.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </TableCell>
