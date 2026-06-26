@@ -40,7 +40,6 @@ export const Route = createFileRoute("/_authenticated/")({
       { property: "og:url", content: "https://smartsports.lovable.app/" },
     ],
     links: [{ rel: "canonical", href: "https://smartsports.lovable.app/" }],
-    ],
   }),
   component: Index,
 });
