@@ -48,6 +48,8 @@ export const Route = createFileRoute("/_authenticated/grants")({
     meta: [
       { title: "Grant Tracking — SMART Sports FY26" },
       { name: "description", content: "Track the SMART Sports grant pipeline from research through reporting." },
+      { property: "og:title", content: "Grant Tracking — SMART Sports FY26" },
+      { property: "og:description", content: "Track the SMART Sports grant pipeline from research through reporting." },
     ],
   }),
   component: GrantsPage,

@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/programs")({
     meta: [
       { title: "Programs Dashboard — SMART Sports" },
       { name: "description", content: "Fundraising and grants tracked by SMART Sports program." },
+      { property: "og:title", content: "Programs Dashboard — SMART Sports" },
+      { property: "og:description", content: "Fundraising and grants tracked by SMART Sports program." },
     ],
   }),
   component: ProgramsPage,

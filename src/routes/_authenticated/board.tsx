@@ -25,6 +25,8 @@ export const Route = createFileRoute("/_authenticated/board")({
     meta: [
       { title: "Board Dashboard — SMART Sports" },
       { name: "description", content: "Board giving, introductions, meetings, and outreach progress for SMART Sports." },
+      { property: "og:title", content: "Board Dashboard — SMART Sports" },
+      { property: "og:description", content: "Board giving, introductions, meetings, and outreach progress for SMART Sports." },
     ],
   }),
   component: BoardPage,

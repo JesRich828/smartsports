@@ -30,6 +30,8 @@ export const Route = createFileRoute("/_authenticated/reports")({
     meta: [
       { title: "Reports — SMART Sports FY26" },
       { name: "description", content: "Filtered fundraising reports: grants due, pipelines, event revenue, and budget progress." },
+      { property: "og:title", content: "Reports — SMART Sports FY26" },
+      { property: "og:description", content: "Filtered fundraising reports: grants due, pipelines, event revenue, and budget progress." },
     ],
   }),
   component: ReportsPage,
