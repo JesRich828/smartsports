@@ -44,6 +44,12 @@ export const Route = createFileRoute("/_authenticated/assistants")({
         content:
           "AI assistants that draft grant proposals, donor emails, sponsorship letters, meeting briefs, board reports, and activity summaries.",
       },
+      { property: "og:title", content: "AI Assistants — SMART Sports FY26" },
+      {
+        property: "og:description",
+        content:
+          "AI assistants that draft grant proposals, donor emails, sponsorship letters, meeting briefs, board reports, and activity summaries.",
+      },
     ],
   }),
   component: AssistantsPage,
