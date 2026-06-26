@@ -33,6 +33,8 @@ export const Route = createFileRoute("/_authenticated/golf")({
     meta: [
       { title: "Events" },
       { name: "description", content: "Track event sponsors, attendees, and revenue." },
+      { property: "og:title", content: "Events — SMART Sports FY26" },
+      { property: "og:description", content: "Track event sponsors, attendees, and revenue." },
     ],
   }),
   component: GolfPage,

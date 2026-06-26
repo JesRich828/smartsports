@@ -37,6 +37,12 @@ export const Route = createFileRoute("/_authenticated/automations")({
         content:
           "Automated alerts for grant deadlines, reports due, and donor follow-ups, plus one-click weekly and monthly fundraising reports.",
       },
+      { property: "og:title", content: "Automations — SMART Sports FY26" },
+      {
+        property: "og:description",
+        content:
+          "Automated alerts for grant deadlines, reports due, and donor follow-ups, plus one-click weekly and monthly fundraising reports.",
+      },
     ],
   }),
   component: AutomationsPage,

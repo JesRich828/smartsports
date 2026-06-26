@@ -42,6 +42,8 @@ export const Route = createFileRoute("/_authenticated/donors")({
     meta: [
       { title: "Donor & Prospect CRM — SMART Sports" },
       { name: "description", content: "Manage individual donors, major gift prospects, corporate sponsors, and partners." },
+      { property: "og:title", content: "Donor & Prospect CRM — SMART Sports" },
+      { property: "og:description", content: "Manage individual donors, major gift prospects, corporate sponsors, and partners." },
     ],
   }),
   component: DonorsPage,

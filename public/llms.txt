@@ -1,0 +1,9 @@
+# SMART Sports — FY26 Fundraising Dashboard
+
+> Fundraising command center for SMART Sports: revenue goals, grant pipeline, donor CRM, golf invitational, and program funding.
+
+SMART Sports Compass is a web-based dashboard for nonprofit fundraising management, helping teams track FY26 revenue, grants, donors, sponsors, and events in one place.
+
+## Pages
+
+- [Sign In](/auth): Secure sign in to the fundraising dashboard.
