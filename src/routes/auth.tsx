@@ -39,7 +39,6 @@ const getAuthOrgSettings = createServerFn({ method: "GET" }).handler(async () =>
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -101,22 +100,9 @@ function AuthPage() {
     }
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const normalizedEmail = email.trim().toLowerCase();
-        const { error } = await supabase.auth.signUp({
-          email: normalizedEmail,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast.success("Account created. Check your email to confirm, then sign in.");
-        setMode("signin");
-        setPassword("");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        navigate({ to: "/" });
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      navigate({ to: "/" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Authentication failed");
     } finally {
@@ -129,6 +115,9 @@ function AuthPage() {
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
+        extraParams: {
+          hd: "sharingexcess.com",
+        },
       });
       if (result.error) {
         toast.error("Google sign-in failed. Please try again.");
@@ -168,12 +157,10 @@ function AuthPage() {
             )}
           </div>
           <h1 className="font-display text-xl font-bold text-foreground">
-            {mode === "signup" ? "Create your account" : "Welcome back"}
+            Welcome back
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {mode === "signup"
-              ? "Register to access the fundraising dashboard."
-              : "Sign in to access the fundraising dashboard."}
+            Sign in to access the fundraising dashboard.
           </p>
 
           <form onSubmit={handleEmail} className="mt-6 space-y-4">
@@ -193,29 +180,19 @@ function AuthPage() {
               <Input
                 id="password"
                 type="password"
-                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {mode === "signup" ? "Sign up" : "Sign in"}
+              Sign in
             </Button>
           </form>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            {mode === "signup" ? "Already have an account?" : "Need an account?"}{" "}
-            <button
-              type="button"
-              className="font-medium text-primary underline-offset-4 hover:underline"
-              onClick={() => {
-                setMode((m) => (m === "signup" ? "signin" : "signup"));
-                setPassword("");
-              }}
-            >
-              {mode === "signup" ? "Sign in" : "Sign up"}
-            </button>
+            Access is invite-only. Contact an administrator to request an account.
           </p>
 
           <div className="my-4 flex items-center gap-3">
