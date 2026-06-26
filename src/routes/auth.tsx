@@ -15,7 +15,14 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign In — SMART Sports FY26 Fundraising" },
       { name: "description", content: "Secure sign in for the SMART Sports fundraising dashboard." },
+      { property: "og:title", content: "Sign In — SMART Sports FY26 Fundraising" },
+      {
+        property: "og:description",
+        content: "Secure sign in for the SMART Sports fundraising dashboard.",
+      },
+      { property: "og:url", content: "https://smartsports.lovable.app/auth" },
     ],
+    links: [{ rel: "canonical", href: "https://smartsports.lovable.app/auth" }],
   }),
   component: AuthPage,
 });
@@ -133,7 +140,7 @@ function AuthPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary px-4 py-12">
+    <main className="flex min-h-screen items-center justify-center bg-secondary px-4 py-12">
       <div className="w-full max-w-md">
         <Link to="/auth" className="mb-6 flex items-center justify-center gap-3">
           <div className="grid leading-tight">
@@ -224,6 +231,6 @@ function AuthPage() {
           </Button>
         </Card>
       </div>
-    </div>
+    </main>
   );
 }
