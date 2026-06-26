@@ -46,7 +46,13 @@ function AuthenticatedLayout() {
             <span className="font-display text-sm font-semibold text-foreground">
               {orgName} Fundraising Command Center
             </span>
-            <Button variant="ghost" size="sm" className="ml-auto gap-2" onClick={signOut}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="ml-auto gap-2"
+              aria-label="Sign out"
+              onClick={signOut}
+            >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Sign out</span>
             </Button>
