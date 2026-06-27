@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as ResourcesFundraisingMetricsRouteImport } from './routes/resources.fundraising-metrics'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedProgramsRouteImport } from './routes/_authenticated/programs'
 import { Route as AuthenticatedGrantsRouteImport } from './routes/_authenticated/grants'
@@ -41,6 +42,12 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ResourcesFundraisingMetricsRoute =
+  ResourcesFundraisingMetricsRouteImport.update({
+    id: '/resources/fundraising-metrics',
+    path: '/resources/fundraising-metrics',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/grants': typeof AuthenticatedGrantsRoute
   '/programs': typeof AuthenticatedProgramsRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/resources/fundraising-metrics': typeof ResourcesFundraisingMetricsRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -107,6 +115,7 @@ export interface FileRoutesByTo {
   '/grants': typeof AuthenticatedGrantsRoute
   '/programs': typeof AuthenticatedProgramsRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/resources/fundraising-metrics': typeof ResourcesFundraisingMetricsRoute
   '/': typeof AuthenticatedIndexRoute
 }
 export interface FileRoutesById {
@@ -122,6 +131,7 @@ export interface FileRoutesById {
   '/_authenticated/grants': typeof AuthenticatedGrantsRoute
   '/_authenticated/programs': typeof AuthenticatedProgramsRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/resources/fundraising-metrics': typeof ResourcesFundraisingMetricsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/grants'
     | '/programs'
     | '/reports'
+    | '/resources/fundraising-metrics'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/grants'
     | '/programs'
     | '/reports'
+    | '/resources/fundraising-metrics'
     | '/'
   id:
     | '__root__'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
     | '/_authenticated/grants'
     | '/_authenticated/programs'
     | '/_authenticated/reports'
+    | '/resources/fundraising-metrics'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
@@ -171,6 +184,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ResourcesFundraisingMetricsRoute: typeof ResourcesFundraisingMetricsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -202,6 +216,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/resources/fundraising-metrics': {
+      id: '/resources/fundraising-metrics'
+      path: '/resources/fundraising-metrics'
+      fullPath: '/resources/fundraising-metrics'
+      preLoaderRoute: typeof ResourcesFundraisingMetricsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
@@ -293,17 +314,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ResourcesFundraisingMetricsRoute: ResourcesFundraisingMetricsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
